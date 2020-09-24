@@ -1,10 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
-import 'package:shopper/main.dart';
-import 'package:shopper/services/auth.dart';
+import 'package:shopper/services/database.dart';
 import 'package:shopper/shared/colors.dart';
 import 'package:shopper/shared/customDrawer.dart';
+import 'package:shopper/shared/custom_bottom_appbar.dart';
+import 'package:shopper/shared/widgets.dart';
+import 'package:shopper/views/categories.dart';
+import 'package:shopper/views/profile.dart';
 
 class StoreHome extends StatefulWidget {
   @override
@@ -13,9 +15,55 @@ class StoreHome extends StatefulWidget {
 
 class _StoreHomeState extends State<StoreHome> {
 
+  Database database = Database();
+  Stream profileStream;
+
+  @override
+  void initState() {
+    getUserProfileInfo();
+    super.initState();
+  }
+
+  getUserProfileInfo() async {
+    database.getUserProfile().then((value){
+      setState(() {
+        profileStream = value;
+      });
+    });
+  }
+
+  int _selectedIndex = 0;
+  static List<Widget> _widgetOptions = <Widget>[
+    Categories(),
+    Text(
+      'Messages',
+      style: normalStyle(35),
+    ),
+    Text(
+      'Favorites',
+      style: normalStyle(35),
+    ),
+    Profile(),
+  ];
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: Container(
+        width: 65.0,
+        height: 65.0,
+        child: FloatingActionButton(
+          child: Icon(Icons.shopping_cart, size: 30,),
+          onPressed: (){},
+        ),
+      ),
       appBar: AppBar(
         elevation: 0,
         leading: Builder(
@@ -27,16 +75,39 @@ class _StoreHomeState extends State<StoreHome> {
           },
         ),
         actions: [
-          IconButton(
-            onPressed: () async{
-              await AuthMethods().signOut();
-              Navigator.pushReplacement(
-                  context, CupertinoPageRoute(builder: (context) => MyApp()));
-            },
-            icon: SvgPicture.asset('assets/signout.svg', color: StyleColors.bigText,),
+          StreamBuilder(
+            stream: profileStream,
+            builder: (context, snapshot) {
+              return snapshot.hasData ? Container(
+                padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 13),
+                child: CircleAvatar(
+                  radius: 15,
+                  backgroundImage: NetworkImage(snapshot.data.data()["img"]),
+                  backgroundColor: Colors.white54,
+                ),
+              )
+                  :Center(child: CircularProgressIndicator(),);
+            }
           )
         ],
       ),
+      bottomNavigationBar: FABBottomAppBar(
+        backgroundColor: Theme.of(context).primaryColor,
+        iconSize: 20,
+        onTabSelected: _onItemTapped,
+        notchedShape: CircularNotchedRectangle(),
+        color: StyleColors.hintText,
+        selectedColor: Theme.of(context).accentColor,
+        items: [
+          FABBottomAppBarItem(iconData1: Icons.content_paste, text: 'Categories'),
+          FABBottomAppBarItem(iconData1: Icons.chat_bubble, text: 'Messages'),
+          FABBottomAppBarItem(iconData1: Icons.favorite, text: 'Favorite'),
+          FABBottomAppBarItem(iconData1: Icons.person, text: 'Profile'),
+        ],
+      ),
+      body:  _widgetOptions.elementAt(_selectedIndex),
     );
   }
+
+
 }

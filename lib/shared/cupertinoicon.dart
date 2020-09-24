@@ -24,18 +24,6 @@ IconData heart = IconData(
     fontPackage: CupertinoIcons.iconFontPackage
 );
 
-IconData person = IconData(
-    62590,
-    fontFamily: CupertinoIcons.iconFont,
-    fontPackage: CupertinoIcons.iconFontPackage
-);
-
-IconData chat = IconData(
-    62459,
-    fontFamily: CupertinoIcons.iconFont,
-    fontPackage: CupertinoIcons.iconFontPackage
-);
-
 IconData settings = IconData(
     62482,
     fontFamily: CupertinoIcons.iconFont,

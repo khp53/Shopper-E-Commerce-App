@@ -38,6 +38,15 @@ TextStyle menuStyle(double fs){
   );
 }
 
+TextStyle priceStyle(double fs, BuildContext context){
+  return TextStyle(
+      fontFamily: "ProductSans",
+      color: Theme.of(context).accentColor,
+      fontSize: fs,
+      fontWeight: FontWeight.bold
+  );
+}
+
 BoxDecoration neumorphicTextInput(){
   return BoxDecoration(
     color: Colors.white,
@@ -56,6 +65,35 @@ BoxDecoration neumorphicTextInput(){
         offset: Offset(
           -6,
           -6,
+        ),
+      ),
+    ],
+    borderRadius: BorderRadius.all(
+      Radius.circular(
+        15,
+      ),
+    ),
+  );
+}
+
+BoxDecoration neumorphicGrid(){
+  return BoxDecoration(
+    color: Colors.white,
+    boxShadow: [
+      BoxShadow(
+        blurRadius: 10,
+        color: Color(0xff000000).withOpacity(.16),
+        offset: Offset(
+          2,
+          3,
+        ),
+      ),
+      BoxShadow(
+        blurRadius: 18,
+        color: Color(0xffffffff),
+        offset: Offset(
+          -3,
+          -3,
         ),
       ),
     ],

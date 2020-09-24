@@ -1,10 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shopper/services/auth.dart';
+import 'package:shopper/services/database.dart';
 import 'package:shopper/shared/widgets.dart';
 import 'package:shopper/views/storehome.dart';
-
 import '../main.dart';
 import 'cupertinoicon.dart';
 
@@ -129,9 +130,34 @@ class CustomDrawerState extends State<CustomDrawer>
   }
 }
 
-class MyDrawer extends StatelessWidget {
+class MyDrawer extends StatefulWidget {
+
+  @override
+  _MyDrawerState createState() => _MyDrawerState();
+}
+
+class _MyDrawerState extends State<MyDrawer> {
+
+  Database _database = Database();
+  Stream profileStream;
+
+  @override
+  void initState() {
+    getUserProfileInfo();
+    super.initState();
+  }
+
+  getUserProfileInfo() async {
+    _database.getUserProfile().then((value){
+      setState(() {
+        profileStream = value;
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+
     return Material(
       color: Colors.blueAccent,
       child: SafeArea(
@@ -141,122 +167,128 @@ class MyDrawer extends StatelessWidget {
           ),
           child: Container(
             color: Theme.of(context).accentColor,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                SizedBox(height: 15,),
-                ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor: Colors.white,
-                  ),
-                  title: Text(
-                    "Karimul Hasan",
-                    style: menuStyle(18),
-                  ),
-                  subtitle: Text(
-                    "khp4121@gmail.com",
-                    style: menuStyle(12),
-                  ),
-                ),
-                Spacer(),
-                ListTile(
-                  onTap: (){
-                    Navigator.pushReplacement(context, CupertinoPageRoute(
-                        builder: (context) => CustomDrawer()
-                    ));
-                  },
-                  leading: Padding(
-                    padding: const EdgeInsets.only(left: 1, top: 0),
-                    child: SvgPicture.asset(
-                        'assets/clipboard.svg',
-                        color: Colors.white,
+            child: StreamBuilder(
+              stream: profileStream,
+              builder: (context, snapshot) {
+                return snapshot.hasData ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    SizedBox(height: 15,),
+                    ListTile(
+                      leading: CircleAvatar(
+                        backgroundImage: NetworkImage(snapshot.data.data()["img"]),
+                        backgroundColor: Colors.white,
+                      ),
+                      title: Text(
+                        snapshot.data.data()["fullName"],
+                        style: menuStyle(18),
+                      ),
+                      subtitle: Text(
+                        snapshot.data.data()["email"],
+                        style: menuStyle(12),
+                      ),
                     ),
-                  ),
-                  title: Text(
-                      'Categories',
-                      style: menuStyle(18),
-                  ),
-                ),
-                ListTile(
-                  onTap: (){
-                    Navigator.pushReplacement(context, CupertinoPageRoute(
-                        builder: (context) => CustomDrawer()
-                    ));
-                  },
-                  leading: Icon(
-                    Icons.chat_bubble
-                  ),
-                  title: Text(
-                    'Messages',
-                    style: menuStyle(18),
-                  ),
-                ),
-                ListTile(
-                  onTap: (){
-                    Navigator.pushReplacement(context, CupertinoPageRoute(
-                        builder: (context) => CustomDrawer()
-                    ));
-                  },
-                  leading: Icon(
-                      heart
-                  ),
-                  title: Text(
-                    'Favorites',
-                    style: menuStyle(18),
-                  ),
-                ),
-                ListTile(
-                  onTap: (){
-                    Navigator.pushReplacement(context, CupertinoPageRoute(
-                        builder: (context) => CustomDrawer()
-                    ));
-                  },
-                  leading: Padding(
-                    padding: const EdgeInsets.only(left: 0, top: 0),
-                    child: SvgPicture.asset(
-                      'assets/cart.svg',
-                      color: Colors.white,
+                    Spacer(),
+                    ListTile(
+                      onTap: (){
+                        Navigator.pushReplacement(context, CupertinoPageRoute(
+                            builder: (context) => CustomDrawer()
+                        ));
+                      },
+                      leading: Padding(
+                        padding: const EdgeInsets.only(left: 1, top: 0),
+                        child: SvgPicture.asset(
+                            'assets/clipboard.svg',
+                            color: Colors.white,
+                        ),
+                      ),
+                      title: Text(
+                          'Categories',
+                          style: menuStyle(18),
+                      ),
                     ),
-                  ),
-                  title: Text(
-                    'Your Cart',
-                    style: menuStyle(18),
-                  ),
-                ),
-                ListTile(
-                  onTap: (){
-                    Navigator.pushReplacement(context, CupertinoPageRoute(
-                        builder: (context) => CustomDrawer()
-                    ));
-                  },
-                  leading: Icon(settings, size: 33,),
-                  title: Text(
-                    'Settings',
-                    style: menuStyle(18),
-                  ),
-                ),
-                Spacer(),
-                ListTile(
-                  onTap: () async{
-                    await AuthMethods().signOut();
-                    Navigator.pushReplacement(
-                        context, CupertinoPageRoute(builder: (context) => MyApp()));
-                  },
-                  leading: Padding(
-                    padding: const EdgeInsets.only(left: 0, top: 0),
-                    child: SvgPicture.asset(
-                      'assets/signout.svg',
-                      color: Colors.white,
+                    ListTile(
+                      onTap: (){
+                        Navigator.pushReplacement(context, CupertinoPageRoute(
+                            builder: (context) => CustomDrawer()
+                        ));
+                      },
+                      leading: Icon(
+                        Icons.chat_bubble
+                      ),
+                      title: Text(
+                        'Messages',
+                        style: menuStyle(18),
+                      ),
                     ),
-                  ),
-                  title: Text(
-                    'Sign Out',
-                    style: menuStyle(18),
-                  ),
-                ),
-                SizedBox(height: 20,),
-              ],
+                    ListTile(
+                      onTap: (){
+                        Navigator.pushReplacement(context, CupertinoPageRoute(
+                            builder: (context) => CustomDrawer()
+                        ));
+                      },
+                      leading: Icon(
+                          heart
+                      ),
+                      title: Text(
+                        'Favorites',
+                        style: menuStyle(18),
+                      ),
+                    ),
+                    ListTile(
+                      onTap: (){
+                        Navigator.pushReplacement(context, CupertinoPageRoute(
+                            builder: (context) => CustomDrawer()
+                        ));
+                      },
+                      leading: Padding(
+                        padding: const EdgeInsets.only(left: 0, top: 0),
+                        child: SvgPicture.asset(
+                          'assets/cart.svg',
+                          color: Colors.white,
+                        ),
+                      ),
+                      title: Text(
+                        'Your Cart',
+                        style: menuStyle(18),
+                      ),
+                    ),
+                    ListTile(
+                      onTap: (){
+                        Navigator.pushReplacement(context, CupertinoPageRoute(
+                            builder: (context) => CustomDrawer()
+                        ));
+                      },
+                      leading: Icon(settings, size: 33,),
+                      title: Text(
+                        'Settings',
+                        style: menuStyle(18),
+                      ),
+                    ),
+                    Spacer(),
+                    ListTile(
+                      onTap: () async{
+                        await AuthMethods().signOut();
+                        Navigator.pushReplacement(
+                            context, CupertinoPageRoute(builder: (context) => MyApp()));
+                      },
+                      leading: Padding(
+                        padding: const EdgeInsets.only(left: 0, top: 0),
+                        child: SvgPicture.asset(
+                          'assets/signout.svg',
+                          color: Colors.white,
+                        ),
+                      ),
+                      title: Text(
+                        'Sign Out',
+                        style: menuStyle(18),
+                      ),
+                    ),
+                    SizedBox(height: 20,),
+                  ],
+                ) : Text("Loading...", style: menuStyle(18),);
+              }
             ),
           ),
         ),
