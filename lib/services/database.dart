@@ -21,6 +21,24 @@ class Database{
       .snapshots();
   }
 
+  getShoesProducts () async{
+    return FirebaseFirestore.instance.collection("products")
+        .doc("categories").collection("shoes")
+        .snapshots();
+  }
+
+  getHouseholdProducts () async{
+    return FirebaseFirestore.instance.collection("products")
+        .doc("categories").collection("household")
+        .snapshots();
+  }
+
+  getGroceriesProducts () async{
+    return FirebaseFirestore.instance.collection("products")
+        .doc("categories").collection("groceries")
+        .snapshots();
+  }
+
   Future<void> updateProfile(Map data) async {
     return FirebaseFirestore.instance.collection('users')
         .doc(FirebaseAuth.instance.currentUser.uid)

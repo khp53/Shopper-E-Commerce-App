@@ -5,6 +5,9 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shopper/services/auth.dart';
 import 'package:shopper/services/database.dart';
 import 'package:shopper/shared/widgets.dart';
+import 'package:shopper/views/categories.dart';
+import 'package:shopper/views/messages.dart';
+import 'package:shopper/views/profile.dart';
 import 'package:shopper/views/storehome.dart';
 import '../main.dart';
 import 'cupertinoicon.dart';
@@ -176,13 +179,27 @@ class _MyDrawerState extends State<MyDrawer> {
                   children: [
                     SizedBox(height: 15,),
                     ListTile(
-                      leading: CircleAvatar(
-                        backgroundImage: NetworkImage(snapshot.data.data()["img"]),
-                        backgroundColor: Colors.white,
+                      leading: InkWell(
+                        onTap: (){
+                          Navigator.pushReplacement(context, CupertinoPageRoute(
+                            builder : (context) => Profile()
+                          ));
+                        },
+                        child: CircleAvatar(
+                          backgroundImage: NetworkImage(snapshot.data.data()["img"]),
+                          backgroundColor: Colors.white,
+                        ),
                       ),
-                      title: Text(
-                        snapshot.data.data()["fullName"],
-                        style: menuStyle(18),
+                      title: InkWell(
+                        onTap: (){
+                          Navigator.pushReplacement(context, CupertinoPageRoute(
+                              builder : (context) => Profile()
+                          ));
+                        },
+                        child: Text(
+                          snapshot.data.data()["fullName"],
+                          style: menuStyle(18),
+                        ),
                       ),
                       subtitle: Text(
                         snapshot.data.data()["email"],
@@ -210,8 +227,8 @@ class _MyDrawerState extends State<MyDrawer> {
                     ),
                     ListTile(
                       onTap: (){
-                        Navigator.pushReplacement(context, CupertinoPageRoute(
-                            builder: (context) => CustomDrawer()
+                        Navigator.push(context, CupertinoPageRoute(
+                            builder: (context) => Messages()
                         ));
                       },
                       leading: Icon(
@@ -256,8 +273,8 @@ class _MyDrawerState extends State<MyDrawer> {
                     ),
                     ListTile(
                       onTap: (){
-                        Navigator.pushReplacement(context, CupertinoPageRoute(
-                            builder: (context) => CustomDrawer()
+                        Navigator.push(context, CupertinoPageRoute(
+                            builder: (context) => Profile()
                         ));
                       },
                       leading: Icon(settings, size: 33,),

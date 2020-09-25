@@ -6,6 +6,7 @@ import 'package:shopper/shared/customDrawer.dart';
 import 'package:shopper/shared/custom_bottom_appbar.dart';
 import 'package:shopper/shared/widgets.dart';
 import 'package:shopper/views/categories.dart';
+import 'package:shopper/views/messages.dart';
 import 'package:shopper/views/profile.dart';
 
 class StoreHome extends StatefulWidget {
@@ -35,10 +36,7 @@ class _StoreHomeState extends State<StoreHome> {
   int _selectedIndex = 0;
   static List<Widget> _widgetOptions = <Widget>[
     Categories(),
-    Text(
-      'Messages',
-      style: normalStyle(35),
-    ),
+    Messages(),
     Text(
       'Favorites',
       style: normalStyle(35),

@@ -1,10 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shopper/services/database.dart';
-import 'package:shopper/shared/colors.dart';
-import 'package:shopper/shared/customDrawer.dart';
 import 'package:shopper/shared/widgets.dart';
-
 import 'edit_profile.dart';
 
 class Profile extends StatefulWidget {
@@ -65,56 +62,74 @@ class ProfileTiles extends StatelessWidget {
   const ProfileTiles({Key key, this.name, this.email, this.img, this.username}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 25),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Hero(
-                tag: 'pic',
-                child: CircleAvatar(
-                  backgroundColor: Colors.grey[900],
-                  backgroundImage: NetworkImage('$img'),
-                  radius: 60,
-                )
-            ),
-            SizedBox(height: 20,),
-            Text(
-              "Name: $name",
-              textAlign: TextAlign.left,
-              style: normalStyle(20),
-            ),
-            SizedBox(height: 10,),
-            Text(
-              "User Name: $username",
-              textAlign: TextAlign.left,
-              style: normalStyle(20),
-            ),
-            SizedBox(height: 10,),
-            Text(
-              "Email:  $email",
-              textAlign: TextAlign.left,
-              style: normalStyle(20),
-            ),
-            SizedBox(height: 30,),
-            Hero(
-              tag: 'edit',
-              child: Container(
-                width: MediaQuery.of(context).size.width,
-                decoration: neumorphicButton(),
-                child: FlatButton.icon(
-                  onPressed: (){
-                    Navigator.push(context, CupertinoPageRoute(
-                        builder: (context) => EditProfile()
-                    ));
-                  },
-                  icon: Icon(Icons.edit, color: Colors.white, size: 20,),
-                  label: Text("Edit Profile" ,style: menuStyle(15),),),
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: Scaffold(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        appBar: AppBar(
+          brightness: Brightness.light,
+          toolbarHeight: 40,
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          elevation: 0,
+          title: Text(
+            "User Profile",
+            style: normalStyle(28),
+          ),
+        ),
+        body: Center(
+          child: SingleChildScrollView(
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 25),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Hero(
+                      tag: 'pic',
+                      child: CircleAvatar(
+                        backgroundColor: Colors.grey[900],
+                        backgroundImage: NetworkImage('$img'),
+                        radius: 60,
+                      )
+                  ),
+                  SizedBox(height: 20,),
+                  Text(
+                    "Name: $name",
+                    textAlign: TextAlign.left,
+                    style: normalStyle(20),
+                  ),
+                  SizedBox(height: 10,),
+                  Text(
+                    "User Name: $username",
+                    textAlign: TextAlign.left,
+                    style: normalStyle(20),
+                  ),
+                  SizedBox(height: 10,),
+                  Text(
+                    "Email:  $email",
+                    textAlign: TextAlign.left,
+                    style: normalStyle(20),
+                  ),
+                  SizedBox(height: 30,),
+                  Hero(
+                    tag: 'edit',
+                    child: Container(
+                      width: MediaQuery.of(context).size.width,
+                      decoration: neumorphicButton(),
+                      child: FlatButton.icon(
+                        onPressed: (){
+                          Navigator.push(context, CupertinoPageRoute(
+                              builder: (context) => EditProfile()
+                          ));
+                        },
+                        icon: Icon(Icons.edit, color: Colors.white, size: 20,),
+                        label: Text("Edit Profile" ,style: menuStyle(15),),),
+                    ),
+                  )
+                ],
               ),
-            )
-          ],
+            ),
+          ),
         ),
       ),
     );
