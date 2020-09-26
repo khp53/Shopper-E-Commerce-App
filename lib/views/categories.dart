@@ -4,7 +4,8 @@ import 'package:shopper/services/database.dart';
 import 'package:shopper/shared/colors.dart';
 import 'package:shopper/shared/cupertinoicon.dart';
 import 'package:shopper/shared/widgets.dart';
-import 'package:shopper/views/product_page.dart';
+import 'package:shopper/views/product_page_electronics.dart';
+import 'package:shopper/views/product_page_shoes.dart';
 
 class Categories extends StatefulWidget {
   final String profileImg;
@@ -68,7 +69,7 @@ class _CategoriesState extends State<Categories> {
         children: [ Column(
           children: [
             Container(
-              decoration: neumorphicTextInput(),
+              decoration: neumorphicSearch(),
               child: Padding(
                 padding: const EdgeInsets.only(left: 15),
                 child: Theme(
@@ -138,7 +139,7 @@ class _CategoriesState extends State<Categories> {
                 ]),
           ),
           Container(
-            height: MediaQuery.of(context).size.height / 1.75,
+            height: MediaQuery.of(context).size.height / 1.62,
             child: TabBarView(children: [
               Container(
                 child: StreamBuilder(
@@ -325,7 +326,7 @@ class _CategoriesState extends State<Categories> {
 class Electronics extends StatelessWidget {
   final String pName;
   final String desc;
-  final String price;
+  final int price;
   final bool fav;
   final String img;
 
@@ -362,7 +363,7 @@ class Electronics extends StatelessWidget {
                           fontSize: 18,
                           fontWeight: FontWeight.bold
                       )),
-                      TextSpan(text: price, style: priceStyle(18, context))
+                      TextSpan(text: price.toString(), style: priceStyle(18, context))
                     ]
                 ),
               ),
@@ -417,7 +418,7 @@ class Electronics extends StatelessWidget {
 class Shoes extends StatelessWidget {
   final String pName;
   final String desc;
-  final String price;
+  final int price;
   final bool fav;
   final String img;
 
@@ -427,7 +428,7 @@ class Shoes extends StatelessWidget {
     return InkWell(
       onTap: (){
         Navigator.push(context, CupertinoPageRoute(
-            builder: (context) => ProductPage(
+            builder: (context) => ProductPageShoes(
               pName: pName,
               price: price,
               desc: desc,
@@ -454,7 +455,7 @@ class Shoes extends StatelessWidget {
                           fontSize: 18,
                           fontWeight: FontWeight.bold
                       )),
-                      TextSpan(text: price, style: priceStyle(18, context))
+                      TextSpan(text: price.toString(), style: priceStyle(18, context))
                     ]
                 ),
               ),

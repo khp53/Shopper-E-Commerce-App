@@ -50,4 +50,22 @@ class Database{
         .child(FirebaseAuth.instance.currentUser.email + '.jpg')
         .putFile(img).onComplete;
   }
+
+  Future addItemToUserCart(cartMap) async{
+    return await FirebaseFirestore.instance.collection("users")
+        .doc(FirebaseAuth.instance.currentUser.uid).collection('item_cart').add(cartMap);
+  }
+
+  fetchItemFromUserCart() async{
+    return FirebaseFirestore.instance.collection("users")
+        .doc(FirebaseAuth.instance.currentUser.uid).collection("item_cart")
+        .snapshots();
+  }
+
+  fetchItemPriceFromUserCart() async{
+    return FirebaseFirestore.instance.collection("users")
+        .doc(FirebaseAuth.instance.currentUser.uid).collection("item_cart")
+        .where('price').snapshots();
+  }
+
 }

@@ -5,6 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shopper/services/auth.dart';
 import 'package:shopper/services/database.dart';
 import 'package:shopper/shared/widgets.dart';
+import 'package:shopper/views/cart.dart';
 import 'package:shopper/views/categories.dart';
 import 'package:shopper/views/messages.dart';
 import 'package:shopper/views/profile.dart';
@@ -181,7 +182,7 @@ class _MyDrawerState extends State<MyDrawer> {
                     ListTile(
                       leading: InkWell(
                         onTap: (){
-                          Navigator.pushReplacement(context, CupertinoPageRoute(
+                          Navigator.push(context, CupertinoPageRoute(
                             builder : (context) => Profile()
                           ));
                         },
@@ -192,7 +193,7 @@ class _MyDrawerState extends State<MyDrawer> {
                       ),
                       title: InkWell(
                         onTap: (){
-                          Navigator.pushReplacement(context, CupertinoPageRoute(
+                          Navigator.push(context, CupertinoPageRoute(
                               builder : (context) => Profile()
                           ));
                         },
@@ -255,8 +256,8 @@ class _MyDrawerState extends State<MyDrawer> {
                     ),
                     ListTile(
                       onTap: (){
-                        Navigator.pushReplacement(context, CupertinoPageRoute(
-                            builder: (context) => CustomDrawer()
+                        Navigator.push(context, CupertinoPageRoute(
+                            builder: (context) => Cart()
                         ));
                       },
                       leading: Padding(

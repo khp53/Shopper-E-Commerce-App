@@ -76,6 +76,35 @@ BoxDecoration neumorphicTextInput(){
   );
 }
 
+BoxDecoration neumorphicSearch(){
+  return BoxDecoration(
+    color: Colors.white,
+    boxShadow: [
+      BoxShadow(
+        blurRadius: 10,
+        color: Color(0xff000000).withOpacity(.10),
+        offset: Offset(
+          1,
+          3,
+        ),
+      ),
+      BoxShadow(
+        blurRadius: 18,
+        color: Color(0xffffffff),
+        offset: Offset(
+          -3,
+          -3,
+        ),
+      ),
+    ],
+    borderRadius: BorderRadius.all(
+      Radius.circular(
+        15,
+      ),
+    ),
+  );
+}
+
 BoxDecoration neumorphicGrid(){
   return BoxDecoration(
     color: Colors.white,
@@ -129,6 +158,35 @@ BoxDecoration neumorphicButton(){
     borderRadius: BorderRadius.all(
       Radius.circular(
         15,
+      ),
+    ),
+  );
+}
+
+BoxDecoration neumorphicBag(BuildContext context){
+  return BoxDecoration(
+    color: Colors.deepOrange,
+    boxShadow: [
+      BoxShadow(
+        blurRadius: 18,
+        color: Color(0xff000000).withOpacity(.20),
+        offset: Offset(
+          6,
+          6,
+        ),
+      ),
+      BoxShadow(
+        blurRadius: 18,
+        color: Color(0xff727bd9).withOpacity(.20),
+        offset: Offset(
+          -6,
+          -6,
+        ),
+      ),
+    ],
+    borderRadius: BorderRadius.all(
+      Radius.circular(
+        50,
       ),
     ),
   );

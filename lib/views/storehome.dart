@@ -5,6 +5,7 @@ import 'package:shopper/shared/colors.dart';
 import 'package:shopper/shared/customDrawer.dart';
 import 'package:shopper/shared/custom_bottom_appbar.dart';
 import 'package:shopper/shared/widgets.dart';
+import 'package:shopper/views/cart.dart';
 import 'package:shopper/views/categories.dart';
 import 'package:shopper/views/messages.dart';
 import 'package:shopper/views/profile.dart';
@@ -55,11 +56,15 @@ class _StoreHomeState extends State<StoreHome> {
     return Scaffold(
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: Container(
-        width: 65.0,
-        height: 65.0,
+        width: 63.0,
+        height: 63.0,
         child: FloatingActionButton(
-          child: Icon(Icons.shopping_cart, size: 30,),
-          onPressed: (){},
+          child: Icon(Icons.shopping_cart, size: 28,),
+          onPressed: (){
+            Navigator.push(context, CupertinoPageRoute(
+              builder: (context) => Cart()
+            ));
+          },
         ),
       ),
       appBar: AppBar(
