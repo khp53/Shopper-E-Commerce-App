@@ -62,10 +62,21 @@ class Database{
         .snapshots();
   }
 
-  fetchItemPriceFromUserCart() async{
+  Future addItemToUserFavorite(favoriteMap) async{
+    return await FirebaseFirestore.instance.collection("users")
+        .doc(FirebaseAuth.instance.currentUser.uid).collection('favorites').add(favoriteMap);
+  }
+
+  checkForSameItemInFav(pname) async{
     return FirebaseFirestore.instance.collection("users")
-        .doc(FirebaseAuth.instance.currentUser.uid).collection("item_cart")
-        .where('price').snapshots();
+        .doc(FirebaseAuth.instance.currentUser.uid).collection('favorites')
+        .where(pname).get();
+  }
+
+  fetchItemFromUserFavorite() async{
+    return FirebaseFirestore.instance.collection("users")
+        .doc(FirebaseAuth.instance.currentUser.uid).collection("favorites")
+        .snapshots();
   }
 
 }

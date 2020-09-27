@@ -10,7 +10,7 @@ import 'cart.dart';
 class ProductPage extends StatefulWidget {
   final String pName;
   final String desc;
-  final int price;
+  final double price;
   final bool fav;
   final String img;
 
@@ -172,42 +172,14 @@ class _ProductPageState extends State<ProductPage> {
                               ),
                             ),
                             Expanded(
-                              child: Padding(
-                                padding: const EdgeInsets.only(top: 2, right: 15),
-                                child: Icon(
-                                  Icons.favorite,
-                                  color: StyleColors.hintText,
-                                  size: 28,
+                              flex: 2,
+                              child: Container(
+                                padding: EdgeInsets.only(left: 35, right: 0, bottom: 60, top: 20),
+                                height: MediaQuery.of(context).size.height / 2.8,
+                                child: Image.network(
+                                  widget.img,
+                                  fit: BoxFit.contain,
                                 ),
-                              ),
-                            ),
-                            Expanded(
-                              flex: 3,
-                              child: Stack(
-                                  children: [
-                                    Positioned(
-                                      left: 20,
-                                      top: 10,
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(100),
-                                        child: Container(
-                                          margin: EdgeInsets.only(right: MediaQuery.of(context).size.width),
-                                          width: MediaQuery.of(context).size.width / 2,
-                                          height: MediaQuery.of(context).size.height / 4,
-                                          color: Colors.deepOrange[100].withOpacity(.5),
-                                        ),
-                                      ),
-                                    ),
-                                    Positioned(
-                                      child: Container(
-                                        padding: EdgeInsets.only(left: 35, right: 0, bottom: 50, top: 30),
-                                        child: Image.network(
-                                          widget.img,
-                                          fit: BoxFit.contain,
-                                        ),
-                                      ),
-                                    ),
-                                  ]
                               ),
                             ),
                           ],

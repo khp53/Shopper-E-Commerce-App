@@ -11,7 +11,7 @@ import 'cart.dart';
 class ProductPageShoes extends StatefulWidget {
   final String pName;
   final String desc;
-  final int price;
+  final double price;
   final bool fav;
   final String img;
 
@@ -183,18 +183,9 @@ class _ProductPageShoesState extends State<ProductPageShoes> {
                               ),
                             ),
                             Expanded(
-                              child: Padding(
-                                padding: const EdgeInsets.only(top: 2, right: 15),
-                                child: Icon(
-                                  Icons.favorite,
-                                  color: StyleColors.hintText,
-                                  size: 28,
-                                ),
-                              ),
-                            ),
-                            Expanded(
                               flex: 3,
                               child: Container(
+                                padding: EdgeInsets.only(bottom: 45),
                                 height: MediaQuery.of(context).size.height / 2.8,
                                 child: Image.network(
                                   widget.img,

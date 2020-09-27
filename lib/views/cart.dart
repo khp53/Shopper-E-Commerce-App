@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:shopper/services/database.dart';
-import 'package:shopper/shared/colors.dart';
 import 'package:shopper/shared/widgets.dart';
 
 class Cart extends StatefulWidget {
@@ -14,14 +13,12 @@ class Cart extends StatefulWidget {
 class _CartState extends State<Cart> {
   Stream profileStream;
   Stream itemStream;
-  Stream itemPriceStream;
   Database _database = Database();
 
   @override
   void initState() {
     getUserProfileInfo();
     fetchItemFromUserCart();
-    fetchItemPriceFromUserCart();
     super.initState();
   }
 
@@ -41,30 +38,29 @@ class _CartState extends State<Cart> {
     });
   }
 
-  fetchItemPriceFromUserCart() async {
-    _database.fetchItemPriceFromUserCart().then((value) {
-      setState(() {
-        itemPriceStream = value;
-      });
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      bottomNavigationBar: Container(
-        padding: EdgeInsets.all(15),
-        margin: EdgeInsets.all(12),
-        width: MediaQuery.of(context).size.width,
-        decoration: neumorphicButton(),
-        child: Text(
-          'Check Out',
-          textAlign: TextAlign.center,
-          style: TextStyle(
-              color: Colors.white,
-              fontSize: 15,
-              fontFamily: 'ProductSans',
-              fontWeight: FontWeight.bold),
+      bottomNavigationBar: Material(
+        child: Ink(
+          child: InkWell(
+            onTap: (){},
+            child: Container(
+              padding: EdgeInsets.all(15),
+              margin: EdgeInsets.all(12),
+              width: MediaQuery.of(context).size.width,
+              decoration: neumorphicButton(),
+              child: Text(
+                'Check Out',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 15,
+                    fontFamily: 'ProductSans',
+                    fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
         ),
       ),
       appBar: AppBar(elevation: 0, actions: [
@@ -121,7 +117,7 @@ class _CartState extends State<Cart> {
                                 pname:
                                     snapshot.data.docs[index].data()['pname'],
                                 price:
-                                    snapshot.data.docs[index].data()['price'],
+                                    snapshot.data.docs[index].data()['price'].toDouble(),
                                 color:
                                     snapshot.data.docs[index].data()['color'],
                                 img: snapshot.data.docs[index].data()['img'],
