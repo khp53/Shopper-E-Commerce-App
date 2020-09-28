@@ -112,7 +112,7 @@ class _SignUpState extends State<SignUp> {
                         decoration: InputDecoration(
                             border: InputBorder.none,
                             hintText: "Full Name",
-                            hintStyle: inputBoxStyle()
+                            hintStyle: inputBoxStyle(12)
                         ),
                       ),
                     ),
@@ -132,7 +132,7 @@ class _SignUpState extends State<SignUp> {
                         decoration: InputDecoration(
                             border: InputBorder.none,
                             hintText: "Username",
-                            hintStyle: inputBoxStyle()
+                            hintStyle: inputBoxStyle(12)
                         ),
                       ),
                     ),
@@ -153,7 +153,7 @@ class _SignUpState extends State<SignUp> {
                         decoration: InputDecoration(
                             border: InputBorder.none,
                             hintText: "Email",
-                            hintStyle: inputBoxStyle()
+                            hintStyle: inputBoxStyle(12)
                         ),
                       ),
                     ),
@@ -186,7 +186,7 @@ class _SignUpState extends State<SignUp> {
                               ),
                               border: InputBorder.none,
                               hintText: "Password",
-                              hintStyle: inputBoxStyle()
+                              hintStyle: inputBoxStyle(12)
                           ),
                         ),
                       ),

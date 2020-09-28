@@ -107,7 +107,7 @@ class _SignInState extends State<SignIn> {
                               suffixIcon: Icon(email),
                               border: InputBorder.none,
                               hintText: "Email",
-                              hintStyle: inputBoxStyle()
+                              hintStyle: inputBoxStyle(12)
                           ),
                         ),
                       ),
@@ -141,7 +141,7 @@ class _SignInState extends State<SignIn> {
                               ),
                               border: InputBorder.none,
                               hintText: "Password",
-                              hintStyle: inputBoxStyle()
+                              hintStyle: inputBoxStyle(12)
                           ),
                         ),
                       ),

@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:shopper/services/database.dart';
 import 'package:shopper/shared/colors.dart';
 import 'package:shopper/shared/cupertinoicon.dart';
+import 'package:shopper/shared/customDrawer.dart';
+import 'package:shopper/shared/loading.dart';
 import 'package:shopper/shared/widgets.dart';
 import 'package:shopper/views/product_page_electronics.dart';
-import 'package:shopper/views/product_page_shoes.dart';
 
 class Categories extends StatefulWidget {
   final String profileImg;
@@ -23,14 +24,24 @@ class _CategoriesState extends State<Categories> {
   Stream shoesStream;
   Stream householdStream;
   Stream groceriesStream;
+  Stream profileStream;
 
   @override
   void initState() {
+    getUserProfileInfo();
     getElectronicsProducts();
     getShoesProducts();
     getHouseholdProducts();
     getGroceriesProducts();
     super.initState();
+  }
+
+  getUserProfileInfo() async {
+    _database.getUserProfile().then((value){
+      setState(() {
+        profileStream = value;
+      });
+    });
   }
 
   getElectronicsProducts() async {
@@ -68,6 +79,39 @@ class _CategoriesState extends State<Categories> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        elevation: 0,
+        leading: Builder(
+          builder: (context) {
+            return IconButton(
+              icon: Icon(Icons.menu, color: StyleColors.bigText, size: 30,),
+              onPressed: () => CustomDrawer.of(context).open(),
+            );
+          },
+        ),
+        actions: [
+          StreamBuilder(
+              stream: profileStream,
+              builder: (context, snapshot) {
+                return snapshot.hasData ? Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 13),
+                  child: CircleAvatar(
+                    radius: 15,
+                    backgroundImage: NetworkImage(snapshot.data.data()["img"]),
+                    backgroundColor: Colors.white54,
+                  ),
+                )
+                    :Center(
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 20),
+                    child:
+                    SizedBox(width: 15, height: 15, child: spinKit),
+                  ),
+                );
+              }
+          )
+        ],
+      ),
       body: SingleChildScrollView(
         child: Container(
           padding: EdgeInsets.only(left: 15, right: 15, top: 15),
@@ -94,7 +138,7 @@ class _CategoriesState extends State<Categories> {
                           suffixIcon: Icon(search),
                           border: InputBorder.none,
                           hintText: "Find Product",
-                          hintStyle: inputBoxStyle()),
+                          hintStyle: inputBoxStyle(12)),
                     ),
                   ),
                 ),
@@ -154,9 +198,9 @@ class _CategoriesState extends State<Categories> {
             TabBarView(physics: NeverScrollableScrollPhysics(), children: [
               Container(
                   child: StreamBuilder(
-                stream: electronicsStream,
-                builder: (context, snapshot) {
-                  return snapshot.hasData
+                    stream: electronicsStream,
+                    builder: (context, snapshot) {
+                      return snapshot.hasData
                       ? GridView.builder(
                           padding: EdgeInsets.symmetric(
                             horizontal: 5,
@@ -175,6 +219,8 @@ class _CategoriesState extends State<Categories> {
                               img: snapshot.data.docs[index].data()['img'],
                               desc: snapshot.data.docs[index].data()['desc'],
                               fav: snapshot.data.docs[index].data()['fav'],
+                              size: List.from(snapshot.data.docs[index].data()['size']),
+                              color: List.from(snapshot.data.docs[index].data()['color']),
                             );
                           },
                         )
@@ -206,6 +252,8 @@ class _CategoriesState extends State<Categories> {
                               img: snapshot.data.docs[index].data()['img'],
                               desc: snapshot.data.docs[index].data()['desc'],
                               fav: snapshot.data.docs[index].data()['fav'],
+                              size: List.from(snapshot.data.docs[index].data()['size']),
+                              color: List.from(snapshot.data.docs[index].data()['color']),
                             );
                           },
                         )
@@ -231,10 +279,12 @@ class _CategoriesState extends State<Categories> {
                           itemBuilder: (context, index) {
                             return Household(
                               pName: snapshot.data.docs[index].data()['pname'],
-                              price: snapshot.data.docs[index].data()['price'],
+                              price: snapshot.data.docs[index].data()['price'].toDouble(),
                               img: snapshot.data.docs[index].data()['img'],
                               desc: snapshot.data.docs[index].data()['desc'],
                               fav: snapshot.data.docs[index].data()['fav'],
+                              size: List.from(snapshot.data.docs[index].data()['size']),
+                              color: List.from(snapshot.data.docs[index].data()['color']),
                             );
                           },
                         )
@@ -264,6 +314,8 @@ class _CategoriesState extends State<Categories> {
                               img: snapshot.data.docs[index].data()['img'],
                               desc: snapshot.data.docs[index].data()['desc'],
                               fav: snapshot.data.docs[index].data()['fav'],
+                              size: List.from(snapshot.data.docs[index].data()['size']),
+                              color: List.from(snapshot.data.docs[index].data()['color']),
                             );
                           },
                         )
@@ -288,9 +340,10 @@ class Electronics extends StatelessWidget {
   final double price;
   final bool fav;
   final String img;
-
+  final List<String> size;
+  final List<String> color;
   const Electronics(
-      {Key key, this.pName, this.desc, this.price, this.fav, this.img})
+      {Key key, this.pName, this.desc, this.price, this.fav, this.img, this.size, this.color})
       : super(key: key);
 
   addToFav() {
@@ -299,6 +352,8 @@ class Electronics extends StatelessWidget {
       "price": price,
       "img": img,
       "desc": desc,
+      "size": size,
+      "color": color,
     };
     Database().addItemToUserFavorite(favoriteMap);
   }
@@ -307,6 +362,7 @@ class Electronics extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
+        print(size);
         Navigator.push(
             context,
             CupertinoPageRoute(
@@ -316,6 +372,8 @@ class Electronics extends StatelessWidget {
                       desc: desc,
                       img: img,
                       fav: fav,
+                      size: size,
+                      color: color,
                     )));
       },
       child: Container(
@@ -413,13 +471,15 @@ class Electronics extends StatelessWidget {
 
 // ignore: must_be_immutable
 class Shoes extends StatefulWidget {
-  String pName;
-  String desc;
-  double price;
-  bool fav;
-  String img;
+  final String pName;
+  final String desc;
+  final double price;
+  final bool fav;
+  final String img;
+  final List<String> size;
+  final List<String> color;
 
-  Shoes({Key key, this.pName, this.desc, this.price, this.fav, this.img})
+  Shoes({Key key, this.pName, this.desc, this.price, this.fav, this.img, this.size, this.color})
       : super(key: key);
 
   @override
@@ -435,6 +495,8 @@ class _ShoesState extends State<Shoes> {
       "price": widget.price,
       "img": widget.img,
       "desc": widget.desc,
+      "size" : widget.size,
+      "color" : widget.color,
     };
     _database.addItemToUserFavorite(favoriteMap);
   }
@@ -446,12 +508,14 @@ class _ShoesState extends State<Shoes> {
         Navigator.push(
             context,
             CupertinoPageRoute(
-                builder: (context) => ProductPageShoes(
+                builder: (context) => ProductPage(
                       pName: widget.pName,
                       price: widget.price,
                       desc: widget.desc,
                       img: widget.img,
                       fav: widget.fav,
+                      size: widget.size,
+                      color: widget.color,
                     )));
       },
       child: Container(
@@ -534,12 +598,14 @@ class _ShoesState extends State<Shoes> {
 class Household extends StatelessWidget {
   final String pName;
   final String desc;
-  final int price;
+  final double price;
   final bool fav;
   final String img;
+  final List<String> size;
+  final List<String> color;
 
   const Household(
-      {Key key, this.pName, this.desc, this.price, this.fav, this.img})
+      {Key key, this.pName, this.desc, this.price, this.fav, this.img, this.size, this.color})
       : super(key: key);
 
   addToFav() {
@@ -548,79 +614,99 @@ class Household extends StatelessWidget {
       "price": price,
       "img": img,
       "desc": desc,
+      "size" : size,
+      "color" : color
     };
     Database().addItemToUserFavorite(favoriteMap);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.only(left: 5, right: 5, bottom: 10),
-      padding: EdgeInsets.all(7),
-      decoration: neumorphicGrid(),
-      child: GridTile(
-        header: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            RichText(
-              text: TextSpan(children: [
-                TextSpan(
-                    text: "\$",
-                    style: TextStyle(
-                        fontFamily: "ProductSans",
-                        color: Colors.deepOrange,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold)),
-                TextSpan(text: '$price', style: priceStyle(18, context))
-              ]),
-            ),
-            Spacer(),
-            Material(
-              child: Ink(
-                child: InkWell(
-                  child: Stack(children: [
-                    Icon(
-                      Icons.favorite,
-                      color: Colors.red,
-                    ),
-                    Icon(
-                      Icons.add,
-                      color: Colors.white,
-                      size: 16,
-                    )
+    return Ink(
+      child: InkWell(
+        onTap: () {
+          Navigator.push(
+              context,
+              CupertinoPageRoute(
+                  builder: (context) => ProductPage(
+                    pName: pName,
+                    price: price,
+                    desc: desc,
+                    img: img,
+                    fav: fav,
+                    size: size,
+                    color: color,
+                  )));
+        },
+        child: Container(
+          margin: EdgeInsets.only(left: 5, right: 5, bottom: 10),
+          padding: EdgeInsets.all(7),
+          decoration: neumorphicGrid(),
+          child: GridTile(
+            header: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                RichText(
+                  text: TextSpan(children: [
+                    TextSpan(
+                        text: "\$",
+                        style: TextStyle(
+                            fontFamily: "ProductSans",
+                            color: Colors.deepOrange,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold)),
+                    TextSpan(text: '$price', style: priceStyle(18, context))
                   ]),
-                  onTap: () {
-                    addToFav();
-                    Scaffold.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          "Item Added To Favorite List!",
-                          style: TextStyle(
-                              fontFamily: 'ProductSans', color: Colors.white),
-                        ),
-                        backgroundColor: Theme.of(context).accentColor,
-                        behavior: SnackBarBehavior.floating,
-                      ),
-                    );
-                  },
                 ),
+                Spacer(),
+                Material(
+                  child: Ink(
+                    child: InkWell(
+                      child: Stack(children: [
+                        Icon(
+                          Icons.favorite,
+                          color: Colors.red,
+                        ),
+                        Icon(
+                          Icons.add,
+                          color: Colors.white,
+                          size: 16,
+                        )
+                      ]),
+                      onTap: () {
+                        addToFav();
+                        Scaffold.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              "Item Added To Favorite List!",
+                              style: TextStyle(
+                                  fontFamily: 'ProductSans', color: Colors.white),
+                            ),
+                            backgroundColor: Theme.of(context).accentColor,
+                            behavior: SnackBarBehavior.floating,
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            child: Container(
+              padding: EdgeInsets.only(bottom: 25),
+              child: Image.network(
+                img,
+                fit: BoxFit.contain,
               ),
             ),
-          ],
-        ),
-        child: Container(
-          padding: EdgeInsets.only(bottom: 25),
-          child: Image.network(
-            img,
-            fit: BoxFit.contain,
-          ),
-        ),
-        footer: Padding(
-          padding: const EdgeInsets.only(bottom: 5, left: 5, right: 5),
-          child: Text(
-            pName,
-            style: priceStyle(13, context),
+            footer: Padding(
+              padding: const EdgeInsets.only(bottom: 5, left: 5, right: 5),
+              child: Text(
+                pName,
+                style: priceStyle(13, context),
+              ),
+            ),
           ),
         ),
       ),
@@ -634,9 +720,10 @@ class Groceries extends StatelessWidget {
   final double price;
   final bool fav;
   final String img;
-
+  final List<String> size;
+  final List<String> color;
   const Groceries(
-      {Key key, this.pName, this.desc, this.price, this.fav, this.img})
+      {Key key, this.pName, this.desc, this.price, this.fav, this.img, this.size, this.color})
       : super(key: key);
 
   addToFav() {
@@ -645,79 +732,99 @@ class Groceries extends StatelessWidget {
       "price": price,
       "img": img,
       "desc": desc,
+      "size" : size,
+      "color" : color
     };
     Database().addItemToUserFavorite(favoriteMap);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.only(left: 5, right: 5, bottom: 10),
-      padding: EdgeInsets.all(7),
-      decoration: neumorphicGrid(),
-      child: GridTile(
-        header: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            RichText(
-              text: TextSpan(children: [
-                TextSpan(
-                    text: "\$",
-                    style: TextStyle(
-                        fontFamily: "ProductSans",
-                        color: Colors.deepOrange,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold)),
-                TextSpan(text: '$price', style: priceStyle(18, context))
-              ]),
-            ),
-            Spacer(),
-            Material(
-              child: Ink(
-                child: InkWell(
-                  child: Stack(children: [
-                    Icon(
-                      Icons.favorite,
-                      color: Colors.red,
-                    ),
-                    Icon(
-                      Icons.add,
-                      color: Colors.white,
-                      size: 16,
-                    )
+    return Ink(
+      child: InkWell(
+        onTap: () {
+          Navigator.push(
+              context,
+              CupertinoPageRoute(
+                  builder: (context) => ProductPage(
+                    pName: pName,
+                    price: price,
+                    desc: desc,
+                    img: img,
+                    fav: fav,
+                    size: size,
+                    color: color,
+                  )));
+        },
+        child: Container(
+          margin: EdgeInsets.only(left: 5, right: 5, bottom: 10),
+          padding: EdgeInsets.all(7),
+          decoration: neumorphicGrid(),
+          child: GridTile(
+            header: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                RichText(
+                  text: TextSpan(children: [
+                    TextSpan(
+                        text: "\$",
+                        style: TextStyle(
+                            fontFamily: "ProductSans",
+                            color: Colors.deepOrange,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold)),
+                    TextSpan(text: '$price', style: priceStyle(18, context))
                   ]),
-                  onTap: () {
-                    addToFav();
-                    Scaffold.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          "Item Added To Favorite List!",
-                          style: TextStyle(
-                              fontFamily: 'ProductSans', color: Colors.white),
-                        ),
-                        backgroundColor: Theme.of(context).accentColor,
-                        behavior: SnackBarBehavior.floating,
-                      ),
-                    );
-                  },
                 ),
+                Spacer(),
+                Material(
+                  child: Ink(
+                    child: InkWell(
+                      child: Stack(children: [
+                        Icon(
+                          Icons.favorite,
+                          color: Colors.red,
+                        ),
+                        Icon(
+                          Icons.add,
+                          color: Colors.white,
+                          size: 16,
+                        )
+                      ]),
+                      onTap: () {
+                        addToFav();
+                        Scaffold.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              "Item Added To Favorite List!",
+                              style: TextStyle(
+                                  fontFamily: 'ProductSans', color: Colors.white),
+                            ),
+                            backgroundColor: Theme.of(context).accentColor,
+                            behavior: SnackBarBehavior.floating,
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            child: Container(
+              padding: EdgeInsets.only(bottom: 35, top: 20),
+              child: Image.network(
+                img,
+                fit: BoxFit.contain,
               ),
             ),
-          ],
-        ),
-        child: Container(
-          padding: EdgeInsets.only(bottom: 35, top: 20),
-          child: Image.network(
-            img,
-            fit: BoxFit.contain,
-          ),
-        ),
-        footer: Padding(
-          padding: const EdgeInsets.only(bottom: 5, left: 5, right: 5),
-          child: Text(
-            pName,
-            style: priceStyle(13, context),
+            footer: Padding(
+              padding: const EdgeInsets.only(bottom: 5, left: 5, right: 5),
+              child: Text(
+                pName,
+                style: priceStyle(13, context),
+              ),
+            ),
           ),
         ),
       ),

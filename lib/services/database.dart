@@ -79,4 +79,9 @@ class Database{
         .snapshots();
   }
 
+  Future paymentUser(paymentMap) async{
+    return await FirebaseFirestore.instance.collection("users")
+        .doc(FirebaseAuth.instance.currentUser.uid).collection('payment').add(paymentMap);
+  }
+
 }

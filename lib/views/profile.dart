@@ -1,6 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shopper/services/database.dart';
+import 'package:shopper/shared/colors.dart';
+import 'package:shopper/shared/customDrawer.dart';
+import 'package:shopper/shared/loading.dart';
 import 'package:shopper/shared/widgets.dart';
 import 'edit_profile.dart';
 
@@ -49,6 +52,39 @@ class _ProfileState extends State<Profile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        appBar: AppBar(
+          elevation: 0,
+          leading: Builder(
+            builder: (context) {
+              return IconButton(
+                icon: Icon(Icons.menu, color: StyleColors.bigText, size: 30,),
+                onPressed: () => CustomDrawer.of(context).open(),
+              );
+            },
+          ),
+          actions: [
+            StreamBuilder(
+                stream: profileStream,
+                builder: (context, snapshot) {
+                  return snapshot.hasData ? Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 13),
+                    child: CircleAvatar(
+                      radius: 15,
+                      backgroundImage: NetworkImage(snapshot.data.data()["img"]),
+                      backgroundColor: Colors.white54,
+                    ),
+                  )
+                      : Center(
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 20),
+                      child:
+                      SizedBox(width: 15, height: 15, child: spinKit),
+                    ),
+                  );
+                }
+            )
+          ],
+        ),
         body: profileList()
     );
   }

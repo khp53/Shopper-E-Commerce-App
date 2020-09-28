@@ -1,9 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:shopper/services/database.dart';
 import 'package:shopper/shared/widgets.dart';
+import 'package:shopper/views/checkout.dart';
 
 class Cart extends StatefulWidget {
   @override
@@ -41,28 +43,6 @@ class _CartState extends State<Cart> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      bottomNavigationBar: Material(
-        child: Ink(
-          child: InkWell(
-            onTap: (){},
-            child: Container(
-              padding: EdgeInsets.all(15),
-              margin: EdgeInsets.all(12),
-              width: MediaQuery.of(context).size.width,
-              decoration: neumorphicButton(),
-              child: Text(
-                'Check Out',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 15,
-                    fontFamily: 'ProductSans',
-                    fontWeight: FontWeight.bold),
-              ),
-            ),
-          ),
-        ),
-      ),
       appBar: AppBar(elevation: 0, actions: [
         StreamBuilder(
             stream: profileStream,
@@ -104,7 +84,7 @@ class _CartState extends State<Cart> {
                 ),
               ),
               Expanded(
-                flex: 10,
+                flex: 11,
                 child: StreamBuilder(
                   stream: itemStream,
                   builder: (context, snapshot) {
@@ -138,6 +118,7 @@ class _CartState extends State<Cart> {
                 ),
               ),
               Expanded(
+                flex: 2,
                 child: StreamBuilder(
                     stream: itemStream,
                     builder: (context, snapshot) {
@@ -157,15 +138,14 @@ class _CartState extends State<Cart> {
                       return Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
-                            Padding(
-                              padding: const EdgeInsets.only(top: 5, bottom: 5),
+                            Expanded(
                               child: RichText(
                                 text: TextSpan(
                                   text: "Total price : ",
                                   style: normalStyle(16),
                                   children: [
                                     TextSpan(
-                                      text: "USD $sum",
+                                      text: "$sum USD",
                                       style: TextStyle(
                                         fontSize: 20,
                                         fontFamily: 'ProductSans',
@@ -174,6 +154,35 @@ class _CartState extends State<Cart> {
                                       ),
                                     )
                                   ]
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              flex: 2,
+                              child: Ink(
+                                child: InkWell(
+                                  onTap: (){
+                                    Navigator.push(context, CupertinoPageRoute(
+                                        builder: (context) => CheckOut(
+                                          totalPayment: sum,
+                                        )
+                                    ));
+                                  },
+                                  child: Container(
+                                    padding: EdgeInsets.all(15),
+                                    margin: EdgeInsets.only(left: 5),
+                                    width: MediaQuery.of(context).size.width,
+                                    decoration: neumorphicButton(),
+                                    child: Text(
+                                      'Check Out',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 15,
+                                          fontFamily: 'ProductSans',
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),
@@ -189,7 +198,7 @@ class _CartState extends State<Cart> {
 class CartTile extends StatelessWidget {
   final String pname;
   final String color;
-  final int price;
+  final double price;
   final String img;
   final String size;
   final int quantity;
@@ -207,106 +216,106 @@ class CartTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Slidable(
-      actionPane: SlidableDrawerActionPane(),
-      actionExtentRatio: 0.25,
-      child: Container(
-        padding: EdgeInsets.only(top: 15, bottom: 15),
-        margin: EdgeInsets.only(top: 8, bottom: 8),
-        decoration: neumorphicSearch(),
-        child: ListTile(
-          leading: ConstrainedBox(
-            constraints: BoxConstraints(
-              minWidth: 60,
-              minHeight: 44,
-              maxWidth: 70,
-              maxHeight: 44,
+        actionPane: SlidableDrawerActionPane(),
+        actionExtentRatio: 0.25,
+        child: Container(
+          padding: EdgeInsets.only(top: 15, bottom: 15),
+          margin: EdgeInsets.only(top: 8, bottom: 8),
+          decoration: neumorphicSearch(),
+          child: ListTile(
+            leading: ConstrainedBox(
+              constraints: BoxConstraints(
+                minWidth: 60,
+                minHeight: 44,
+                maxWidth: 70,
+                maxHeight: 44,
+              ),
+              child: Image.network(
+                img,
+                fit: BoxFit.cover,
+              ),
             ),
-            child: Image.network(
-              img,
-              fit: BoxFit.cover,
+            title: Text(
+              '$pname',
+              style: normalStyle(17),
             ),
-          ),
-          title: Text(
-            '$pname',
-            style: normalStyle(17),
-          ),
-          subtitle: Padding(
-            padding: const EdgeInsets.only(top: 5),
-            child: Row(
-              children: [
-                CircleAvatar(
-                  radius: 8,
-                  backgroundColor: Hexcolor(color),
-                ),
-                SizedBox(
-                  width: 8,
-                ),
-                Text(
-                  '\$$price',
-                  style: TextStyle(
-                      color: Colors.grey,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'ProductSans',
-                      fontSize: 15),
-                ),
-                SizedBox(
-                  width: 8,
-                ),
-                Text(
-                  'S:$size',
-                  style: TextStyle(
-                      color: Colors.grey,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'ProductSans',
-                      fontSize: 15),
-                ),
-                SizedBox(
-                  width: 8,
-                ),
-                Text(
-                  'Q:$quantity',
-                  style: TextStyle(
-                      color: Colors.grey,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'ProductSans',
-                      fontSize: 15),
-                ),
-              ],
+            subtitle: Padding(
+              padding: const EdgeInsets.only(top: 5),
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    radius: 8,
+                    backgroundColor: Hexcolor(color),
+                  ),
+                  SizedBox(
+                    width: 8,
+                  ),
+                  Text(
+                    '\$$price',
+                    style: TextStyle(
+                        color: Colors.grey,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'ProductSans',
+                        fontSize: 15),
+                  ),
+                  SizedBox(
+                    width: 8,
+                  ),
+                  Text(
+                    'S:$size',
+                    style: TextStyle(
+                        color: Colors.grey,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'ProductSans',
+                        fontSize: 15),
+                  ),
+                  SizedBox(
+                    width: 8,
+                  ),
+                  Text(
+                    'Q:$quantity',
+                    style: TextStyle(
+                        color: Colors.grey,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'ProductSans',
+                        fontSize: 15),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
-      ),
-      secondaryActions: <Widget>[
-        IconSlideAction(
-          color: Colors.white,
-          iconWidget: Icon(
-            Icons.menu,
-            size: 35,
-            color: Theme.of(context).accentColor,
-          ),
-          onTap: () {},
-        ),
-        IconSlideAction(
-          color: Colors.red,
-          iconWidget: Icon(
-            Icons.delete,
-            size: 35,
+        secondaryActions: <Widget>[
+          IconSlideAction(
             color: Colors.white,
+            iconWidget: Icon(
+              Icons.menu,
+              size: 35,
+              color: Theme.of(context).accentColor,
+            ),
+            onTap: () {},
           ),
-          onTap: () async {
-            await FirebaseFirestore.instance
-                .runTransaction((Transaction myTransaction) async {
-              myTransaction.delete(dId);
-            });
-            Scaffold.of(context).showSnackBar(SnackBar(
-              content: Text("Item has been removed from cart!"),
-              backgroundColor: Colors.red,
-              elevation: 0,
-              behavior: SnackBarBehavior.floating,
-            ));
-          },
-        ),
-      ],
+          IconSlideAction(
+            color: Colors.red,
+            iconWidget: Icon(
+              Icons.delete,
+              size: 35,
+              color: Colors.white,
+            ),
+            onTap: () async {
+              await FirebaseFirestore.instance
+                  .runTransaction((Transaction myTransaction) async {
+                myTransaction.delete(dId);
+              });
+              Scaffold.of(context).showSnackBar(SnackBar(
+                content: Text("Item has been removed from cart!"),
+                backgroundColor: Colors.red,
+                elevation: 0,
+                behavior: SnackBarBehavior.floating,
+              ));
+            },
+          ),
+        ],
     );
   }
 }

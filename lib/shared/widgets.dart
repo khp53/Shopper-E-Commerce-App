@@ -192,12 +192,12 @@ BoxDecoration neumorphicBag(BuildContext context){
   );
 }
 
-TextStyle inputBoxStyle(){
+TextStyle inputBoxStyle(double fs){
   return TextStyle(
     color: StyleColors.hintText,
     fontFamily: "ProductSans",
     fontWeight: FontWeight.bold,
-    fontSize: 12,
+    fontSize: fs,
   );
 }
 

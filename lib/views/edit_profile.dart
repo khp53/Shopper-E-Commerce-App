@@ -130,7 +130,7 @@ class _EditProfileState extends State<EditProfile> {
                                                 decoration: InputDecoration(
                                                     border: InputBorder.none,
                                                     hintText: snapshot.data.data()["fullName"],
-                                                    hintStyle: inputBoxStyle()),
+                                                    hintStyle: inputBoxStyle(12)),
                                               ),
                                             ),
                                           ),
@@ -158,7 +158,7 @@ class _EditProfileState extends State<EditProfile> {
                                                     border: InputBorder.none,
                                                     hintText: snapshot.data
                                                         .data()["userName"],
-                                                    hintStyle: inputBoxStyle()),
+                                                    hintStyle: inputBoxStyle(12)),
                                               ),
                                             ),
                                           ),
@@ -185,7 +185,7 @@ class _EditProfileState extends State<EditProfile> {
                                                 decoration: InputDecoration(
                                                     border: InputBorder.none,
                                                     hintText: snapshot.data.data()["email"],
-                                                    hintStyle: inputBoxStyle()),
+                                                    hintStyle: inputBoxStyle(12)),
                                               ),
                                             ),
                                           ),

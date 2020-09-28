@@ -3,9 +3,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:shopper/services/database.dart';
+import 'package:shopper/shared/colors.dart';
+import 'package:shopper/shared/customDrawer.dart';
+import 'package:shopper/shared/loading.dart';
 import 'package:shopper/shared/widgets.dart';
 import 'package:shopper/views/product_page_electronics.dart';
-import 'package:shopper/views/product_page_shoes.dart';
 
 class Favorites extends StatefulWidget {
   @override
@@ -14,14 +16,23 @@ class Favorites extends StatefulWidget {
 
 class _FavoritesState extends State<Favorites> {
   Stream favStream;
+  Stream profileStream;
   Database _database = Database();
 
   @override
   void initState() {
+    getUserProfileInfo();
     fetchItemFromUserFavorite();
     super.initState();
   }
 
+  getUserProfileInfo() async {
+    _database.getUserProfile().then((value){
+      setState(() {
+        profileStream = value;
+      });
+    });
+  }
 
   fetchItemFromUserFavorite() async {
     _database.fetchItemFromUserFavorite().then((value) {
@@ -34,6 +45,39 @@ class _FavoritesState extends State<Favorites> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        elevation: 0,
+        leading: Builder(
+          builder: (context) {
+            return IconButton(
+              icon: Icon(Icons.menu, color: StyleColors.bigText, size: 30,),
+              onPressed: () => CustomDrawer.of(context).open(),
+            );
+          },
+        ),
+        actions: [
+          StreamBuilder(
+              stream: profileStream,
+              builder: (context, snapshot) {
+                return snapshot.hasData ? Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 13),
+                  child: CircleAvatar(
+                    radius: 15,
+                    backgroundImage: NetworkImage(snapshot.data.data()["img"]),
+                    backgroundColor: Colors.white54,
+                  ),
+                )
+                    : Center(
+                        child: Padding(
+                          padding: const EdgeInsets.only(right: 20),
+                          child:
+                              SizedBox(width: 15, height: 15, child: spinKit),
+                        ),
+                      );
+              }
+          )
+        ],
+      ),
       body: Container(
           padding: EdgeInsets.only(
             left: 15,
@@ -72,6 +116,8 @@ class _FavoritesState extends State<Favorites> {
                                 img: snapshot.data.docs[index].data()['img'],
                                 dId: snapshot.data.documents[index].reference,
                                 desc: snapshot.data.docs[index].data()['desc'],
+                                size: List.from(snapshot.data.docs[index].data()['size'],),
+                                color: List.from(snapshot.data.docs[index].data()['color'],),
                               );
                             },
                           )
@@ -95,13 +141,15 @@ class CartTile extends StatelessWidget {
   final double price;
   final String img;
   final String desc;
+  final List<String> size;
+  final List<String> color;
   final DocumentReference dId;
   const CartTile(
       {Key key,
       this.pname,
       this.price,
       this.img,
-      this.dId, this.desc})
+      this.dId, this.desc, this.size, this.color})
       : super(key: key);
 
   @override
@@ -162,6 +210,8 @@ class CartTile extends StatelessWidget {
                 price: price,
                 pName: pname,
                 desc: desc,
+                size: size,
+                color: color,
               )
             ));
           },

@@ -1,10 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:hexcolor/hexcolor.dart';
 import 'package:shopper/services/database.dart';
 import 'package:shopper/shared/colors.dart';
 import 'package:shopper/shared/loading.dart';
 import 'package:shopper/shared/widgets.dart';
-
 import 'cart.dart';
 
 class ProductPage extends StatefulWidget {
@@ -13,9 +13,11 @@ class ProductPage extends StatefulWidget {
   final double price;
   final bool fav;
   final String img;
+  final List<String> size;
+  final List<String> color;
 
   const ProductPage(
-      {Key key, this.pName, this.desc, this.price, this.fav, this.img})
+      {Key key, this.pName, this.desc, this.price, this.fav, this.img, this.size, this.color,})
       : super(key: key);
 
   @override
@@ -29,8 +31,8 @@ class _ProductPageState extends State<ProductPage> {
   final _formKey = GlobalKey<FormState>();
   final List<int> quantity = [1, 2, 3, 4, 5, 6, 7, 8];
   int _currentQuantity = 1;
-  String _currentSize = 'NA';
-  String _currentColor = '#FFFFFF';
+  String _currentColor;
+  String _currentSize;
 
   bool isLoading = false;
 
@@ -38,6 +40,7 @@ class _ProductPageState extends State<ProductPage> {
   void initState() {
     getUserProfileInfo();
     super.initState();
+    print(widget.size);
   }
 
   getUserProfileInfo() async {
@@ -163,22 +166,22 @@ class _ProductPageState extends State<ProductPage> {
                                       style: TextStyle(
                                           fontFamily: "ProductSans",
                                           color: Colors.deepOrange,
-                                          fontSize: 25,
+                                          fontSize: 22,
                                           fontWeight: FontWeight.bold)),
                                   TextSpan(
                                       text: widget.price.toString(),
-                                      style: priceStyle(25, context))
+                                      style: priceStyle(22, context))
                                 ]),
                               ),
                             ),
                             Expanded(
-                              flex: 2,
+                              flex: 3,
                               child: Container(
-                                padding: EdgeInsets.only(left: 35, right: 0, bottom: 60, top: 20),
+                                padding: EdgeInsets.only(bottom: 55, left: 15),
                                 height: MediaQuery.of(context).size.height / 2.8,
                                 child: Image.network(
                                   widget.img,
-                                  fit: BoxFit.contain,
+                                  fit: BoxFit.fitWidth,
                                 ),
                               ),
                             ),
@@ -295,19 +298,70 @@ class _ProductPageState extends State<ProductPage> {
                                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                   children: [
                                     Expanded(
-                                      child: Center(
-                                        child: Text(
-                                            "NA",
-                                            style: priceStyle(18, context)
+                                      child: DropdownButtonFormField(
+                                        decoration: InputDecoration(
+                                            border: InputBorder.none
                                         ),
+                                        value: _currentSize = widget.size[0],
+                                        onChanged: (value) {
+                                          _currentSize = value;
+                                        },
+                                        selectedItemBuilder: (BuildContext context) {
+                                          return widget.size.map<Widget>((dynamic s) {
+                                            return Container(
+                                                alignment: Alignment.centerRight,
+                                                width: MediaQuery.of(context).size.width / 5.5,
+                                                child: Text(s, style: priceStyle(18, context), textAlign: TextAlign.center)
+                                            );
+                                          }).toList();
+                                        },
+                                        items: widget.size.map((s) {
+                                          return DropdownMenuItem(
+                                            value: s,
+                                            child: Center(child: Text(s.toString(), style: priceStyle(18, context))),
+                                          );
+                                        }).toList(),
                                       ),
                                     ),
                                     Expanded(
-                                      child: Center(
-                                        child: Text(
-                                            "NA",
-                                            style: priceStyle(18, context)
+                                      child: DropdownButtonFormField(
+                                        decoration: InputDecoration(
+                                            border: InputBorder.none
                                         ),
+                                        value: _currentColor = widget.color[0],
+                                        onChanged: (value) {
+                                          _currentColor = value;
+                                        },
+                                        selectedItemBuilder:
+                                            (BuildContext context) {
+                                          return widget.color.map<Widget>((String c) {
+                                            return Container(
+                                              margin: EdgeInsets.only(
+                                                  left: MediaQuery.of(context)
+                                                      .size
+                                                      .width /
+                                                      8.8),
+                                              alignment: Alignment.center,
+                                              width: MediaQuery.of(context)
+                                                  .size
+                                                  .width /
+                                                  15,
+                                              child: CircleAvatar(
+                                                backgroundColor: Hexcolor(c),
+                                              ),
+                                            );
+                                          }).toList();
+                                        },
+                                        items: widget.color.map((c) {
+                                          return DropdownMenuItem(
+                                            value: c,
+                                            child: Center(
+                                              child: CircleAvatar(
+                                                backgroundColor: Hexcolor(c),
+                                              ),
+                                            ),
+                                          );
+                                        }).toList(),
                                       ),
                                     ),
                                     Expanded(
