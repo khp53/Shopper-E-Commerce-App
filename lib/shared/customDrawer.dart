@@ -7,6 +7,7 @@ import 'package:shopper/services/database.dart';
 import 'package:shopper/shared/widgets.dart';
 import 'package:shopper/views/cart.dart';
 import 'package:shopper/views/categories.dart';
+import 'package:shopper/views/favorite.dart';
 import 'package:shopper/views/messages.dart';
 import 'package:shopper/views/profile.dart';
 import 'package:shopper/views/storehome.dart';
@@ -242,8 +243,8 @@ class _MyDrawerState extends State<MyDrawer> {
                     ),
                     ListTile(
                       onTap: (){
-                        Navigator.pushReplacement(context, CupertinoPageRoute(
-                            builder: (context) => CustomDrawer()
+                        Navigator.push(context, CupertinoPageRoute(
+                            builder: (context) => Favorites()
                         ));
                       },
                       leading: Icon(
