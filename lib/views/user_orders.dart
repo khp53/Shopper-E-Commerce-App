@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:shopper/services/database.dart';
 import 'package:shopper/shared/colors.dart';
-import 'package:shopper/shared/customDrawer.dart';
 import 'package:shopper/shared/loading.dart';
 
-class Messages extends StatefulWidget {
+class UserOrders extends StatefulWidget {
   @override
-  _MessagesState createState() => _MessagesState();
+  _UserOrdersState createState() => _UserOrdersState();
 }
 
-class _MessagesState extends State<Messages> {
+class _UserOrdersState extends State<UserOrders> {
   Stream profileStream;
   Database _database = Database();
 
@@ -32,18 +31,6 @@ class _MessagesState extends State<Messages> {
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
-        leading: Builder(
-          builder: (context) {
-            return IconButton(
-              icon: Icon(
-                Icons.menu,
-                color: StyleColors.bigText,
-                size: 30,
-              ),
-              onPressed: () => CustomDrawer.of(context).open(),
-            );
-          },
-        ),
         actions: [
           StreamBuilder(
               stream: profileStream,
@@ -75,7 +62,7 @@ class _MessagesState extends State<Messages> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
-              Icons.chat_bubble_outline,
+              Icons.shopping_basket,
               size: 150,
               color: StyleColors.hintText,
             ),

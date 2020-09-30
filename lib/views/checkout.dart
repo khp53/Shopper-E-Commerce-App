@@ -8,8 +8,7 @@ import 'package:shopper/shared/widgets.dart';
 
 class CheckOut extends StatefulWidget {
   final double totalPayment;
-  final String items;
-  const CheckOut({Key key, @required this.totalPayment, this.items}) : super(key: key);
+  const CheckOut({Key key, @required this.totalPayment}) : super(key: key);
 
   @override
   _CheckOutState createState() => _CheckOutState();
@@ -171,12 +170,16 @@ class Card extends StatefulWidget {
   final String customerName;
   final double totalPayment;
   final String shippingAddress;
-  final String items;
-  const Card(
+  String items;
+  final int quantity;
+
+  Card(
       {Key key,
       this.customerName,
       this.totalPayment,
-      this.shippingAddress, this.items})
+      this.shippingAddress,
+      this.items,
+      this.quantity})
       : super(key: key);
 
   @override
@@ -199,12 +202,12 @@ class _CardState extends State<Card> {
       });
       Map<String, dynamic> paymentMap = {
         "customerName": widget.customerName,
-        "totalPayment" : widget.totalPayment,
+        "totalPayment": widget.totalPayment,
         "shippingAddress": widget.shippingAddress,
-        "nameOnCard" : nameOnCard.text,
+        "nameOnCard": nameOnCard.text,
         "cardNumber": cardNumber.text,
         "expiryDate": expiryDate.text,
-        "ccv": ccv.text
+        "ccv": ccv.text,
       };
       Database().paymentUser(paymentMap);
     }else {
@@ -244,6 +247,10 @@ class _CardState extends State<Card> {
         child: Column(
           children: [
             Container(
+              width: MediaQuery
+                  .of(context)
+                  .size
+                  .width,
               margin: EdgeInsets.only(left: 15, right: 15, top: 20),
               padding: EdgeInsets.all(20),
               decoration: neumorphicButton(),
@@ -511,6 +518,10 @@ class PayPal extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(children: [
       Container(
+        width: MediaQuery
+            .of(context)
+            .size
+            .width,
         margin: EdgeInsets.only(left: 15, right: 15, top: 20),
         padding: EdgeInsets.all(20),
         decoration: neumorphicButton(),
@@ -581,6 +592,10 @@ class _CashState extends State<Cash> {
   Widget build(BuildContext context) {
     return Column(children: [
       Container(
+        width: MediaQuery
+            .of(context)
+            .size
+            .width,
         margin: EdgeInsets.only(left: 15, right: 15, top: 20),
         padding: EdgeInsets.all(20),
         decoration: neumorphicButton(),

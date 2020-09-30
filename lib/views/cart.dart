@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:shopper/services/database.dart';
+import 'package:shopper/shared/loading.dart';
 import 'package:shopper/shared/widgets.dart';
 import 'package:shopper/views/checkout.dart';
 
@@ -59,7 +60,7 @@ class _CartState extends State<Cart> {
                       ),
                     )
                   : Center(
-                      child: CircularProgressIndicator(),
+                child: spinKit,
                     );
             })
       ]),
@@ -109,11 +110,7 @@ class _CartState extends State<Cart> {
                             },
                           )
                         : Center(
-                            child: Text(
-                              "Loading...",
-                              style: normalStyle(15),
-                            ),
-                          );
+                        child: spinKit);
                   },
                 ),
               ),
@@ -129,64 +126,69 @@ class _CartState extends State<Cart> {
                             style: normalStyle(15),
                           ),
                         );
-                      }
-                      var ds = snapshot.data.docs;
-                      double sum = 0.0;
-                      for(int i=0; i<ds.length;i++)
-                        sum+=(ds[i].data()['price']);
-
-                      return Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Expanded(
-                              child: RichText(
-                                text: TextSpan(
-                                  text: "Total price : ",
-                                  style: normalStyle(16),
-                                  children: [
-                                    TextSpan(
-                                      text: "$sum USD",
-                                      style: TextStyle(
-                                        fontSize: 20,
-                                        fontFamily: 'ProductSans',
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.deepOrange
-                                      ),
-                                    )
-                                  ]
+                      } else {
+                        var ds = snapshot.data.docs;
+                        double sum = 0.0;
+                        for (int i = 0; i < ds.length; i++)
+                          sum += (ds[i].data()['price']);
+                        return Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              Expanded(
+                                child: RichText(
+                                  text: TextSpan(
+                                      text: "Total price : ",
+                                      style: normalStyle(16),
+                                      children: [
+                                        TextSpan(
+                                          text: "$sum USD",
+                                          style: TextStyle(
+                                              fontSize: 20,
+                                              fontFamily: 'ProductSans',
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.deepOrange
+                                          ),
+                                        )
+                                      ]
+                                  ),
                                 ),
                               ),
-                            ),
-                            Expanded(
-                              flex: 2,
-                              child: Ink(
-                                child: InkWell(
-                                  onTap: (){
-                                    Navigator.push(context, CupertinoPageRoute(
-                                        builder: (context) => CheckOut(
-                                          totalPayment: sum,
-                                        )
-                                    ));
-                                  },
-                                  child: Container(
-                                    padding: EdgeInsets.all(15),
-                                    margin: EdgeInsets.only(left: 5),
-                                    width: MediaQuery.of(context).size.width,
-                                    decoration: neumorphicButton(),
-                                    child: Text(
-                                      'Check Out',
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 15,
-                                          fontFamily: 'ProductSans',
-                                          fontWeight: FontWeight.bold),
+                              Expanded(
+                                flex: 2,
+                                child: Ink(
+                                  child: InkWell(
+                                    onTap: () {
+                                      Navigator.push(
+                                          context, CupertinoPageRoute(
+                                          builder: (context) =>
+                                              CheckOut(
+                                                totalPayment: sum,
+                                              )
+                                      ));
+                                    },
+                                    child: Container(
+                                      padding: EdgeInsets.all(15),
+                                      margin: EdgeInsets.only(left: 5),
+                                      width: MediaQuery
+                                          .of(context)
+                                          .size
+                                          .width,
+                                      decoration: neumorphicButton(),
+                                      child: Text(
+                                        'Check Out',
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 15,
+                                            fontFamily: 'ProductSans',
+                                            fontWeight: FontWeight.bold),
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
-                          ]);
+                            ]);
+                      }
                     }),
               ),
             ],

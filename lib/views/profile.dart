@@ -5,6 +5,8 @@ import 'package:shopper/shared/colors.dart';
 import 'package:shopper/shared/customDrawer.dart';
 import 'package:shopper/shared/loading.dart';
 import 'package:shopper/shared/widgets.dart';
+import 'package:shopper/views/user_orders.dart';
+
 import 'edit_profile.dart';
 
 class Profile extends StatefulWidget {
@@ -12,6 +14,7 @@ class Profile extends StatefulWidget {
   final String email;
 
   const Profile({Key key, this.name, this.email}) : super(key: key);
+
   @override
   _ProfileState createState() => _ProfileState();
 }
@@ -27,27 +30,28 @@ class _ProfileState extends State<Profile> {
   }
 
   getUserProfileInfo() async {
-    database.getUserProfile().then((value){
+    database.getUserProfile().then((value) {
       setState(() {
         profileStream = value;
       });
     });
   }
 
-  Widget profileList(){
+  Widget profileList() {
     return StreamBuilder(
         stream: profileStream,
-        builder: (context, snapshot){
-          return snapshot.hasData ? ProfileTiles(
-            name: snapshot.data.data()["fullName"],
-            email: snapshot.data.data()["email"],
-            img: snapshot.data.data()["img"],
-            username: snapshot.data.data()["userName"],
-          ) : Center(child: CircularProgressIndicator());
-        }
-    );
+        builder: (context, snapshot) {
+          return snapshot.hasData
+              ? ProfileTiles(
+                  name: snapshot.data.data()["fullName"],
+                  email: snapshot.data.data()["email"],
+                  img: snapshot.data.data()["img"],
+                  username: snapshot.data.data()["userName"],
+                  shippingAddress: snapshot.data.data()["shippingAddress"],
+                )
+              : Center(child: spinKit);
+        });
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -57,7 +61,11 @@ class _ProfileState extends State<Profile> {
           leading: Builder(
             builder: (context) {
               return IconButton(
-                icon: Icon(Icons.menu, color: StyleColors.bigText, size: 30,),
+                icon: Icon(
+                  Icons.menu,
+                  color: StyleColors.bigText,
+                  size: 30,
+                ),
                 onPressed: () => CustomDrawer.of(context).open(),
               );
             },
@@ -66,11 +74,14 @@ class _ProfileState extends State<Profile> {
             StreamBuilder(
                 stream: profileStream,
                 builder: (context, snapshot) {
-                  return snapshot.hasData ? Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 13),
+                  return snapshot.hasData
+                      ? Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 15, vertical: 13),
                     child: CircleAvatar(
                       radius: 15,
-                      backgroundImage: NetworkImage(snapshot.data.data()["img"]),
+                      backgroundImage:
+                      NetworkImage(snapshot.data.data()["img"]),
                       backgroundColor: Colors.white54,
                     ),
                   )
@@ -81,12 +92,10 @@ class _ProfileState extends State<Profile> {
                       SizedBox(width: 15, height: 15, child: spinKit),
                     ),
                   );
-                }
-            )
+                })
           ],
         ),
-        body: profileList()
-    );
+        body: profileList());
   }
 }
 
@@ -95,17 +104,26 @@ class ProfileTiles extends StatelessWidget {
   final String email;
   final String img;
   final String username;
-  const ProfileTiles({Key key, this.name, this.email, this.img, this.username}) : super(key: key);
+  final String shippingAddress;
+
+  const ProfileTiles(
+      {Key key, this.name, this.email, this.img, this.username, this.shippingAddress})
+      : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        backgroundColor: Theme
+            .of(context)
+            .scaffoldBackgroundColor,
         appBar: AppBar(
           brightness: Brightness.light,
-          toolbarHeight: 40,
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          toolbarHeight: 20,
+          backgroundColor: Theme
+              .of(context)
+              .scaffoldBackgroundColor,
           elevation: 0,
           title: Text(
             "User Profile",
@@ -126,42 +144,123 @@ class ProfileTiles extends StatelessWidget {
                         backgroundColor: Colors.grey[900],
                         backgroundImage: NetworkImage('$img'),
                         radius: 60,
-                      )
+                      )),
+                  SizedBox(
+                    height: 20,
                   ),
-                  SizedBox(height: 20,),
-                  Text(
-                    "Name: $name",
-                    textAlign: TextAlign.left,
-                    style: normalStyle(20),
+                  RichText(
+                    text: TextSpan(
+                        text: "Name: ",
+                        style: profileStyle(18),
+                        children: [
+                          TextSpan(
+                              text: '$name',
+                              style: normalStyle(18)
+                          )
+                        ]
+                    ),
                   ),
-                  SizedBox(height: 10,),
-                  Text(
-                    "User Name: $username",
-                    textAlign: TextAlign.left,
-                    style: normalStyle(20),
+                  SizedBox(
+                    height: 10,
                   ),
-                  SizedBox(height: 10,),
-                  Text(
-                    "Email:  $email",
-                    textAlign: TextAlign.left,
-                    style: normalStyle(20),
+                  RichText(
+                    text: TextSpan(
+                        text: "User Name: ",
+                        style: profileStyle(18),
+                        children: [
+                          TextSpan(
+                              text: '$username',
+                              style: normalStyle(18)
+                          )
+                        ]
+                    ),
                   ),
-                  SizedBox(height: 30,),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  RichText(
+                    text: TextSpan(
+                        text: "Email: ",
+                        style: profileStyle(18),
+                        children: [
+                          TextSpan(
+                              text: '$email',
+                              style: normalStyle(18)
+                          )
+                        ]
+                    ),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  RichText(
+                    text: TextSpan(
+                        text: "Shipping Address: ",
+                        style: profileStyle(18),
+                        children: [
+                          TextSpan(
+                              text: '$shippingAddress',
+                              style: normalStyle(18)
+                          )
+                        ]
+                    ),
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
                   Hero(
                     tag: 'edit',
                     child: Container(
-                      width: MediaQuery.of(context).size.width,
+                      width: MediaQuery
+                          .of(context)
+                          .size
+                          .width,
                       decoration: neumorphicButton(),
                       child: FlatButton.icon(
-                        onPressed: (){
-                          Navigator.push(context, CupertinoPageRoute(
-                              builder: (context) => EditProfile()
-                          ));
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              CupertinoPageRoute(
+                                  builder: (context) => EditProfile()));
                         },
-                        icon: Icon(Icons.edit, color: Colors.white, size: 20,),
-                        label: Text("Edit Profile" ,style: menuStyle(15),),),
+                        icon: Icon(
+                          Icons.edit,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                        label: Text(
+                          "Edit Profile",
+                          style: menuStyle(15),
+                        ),
+                      ),
                     ),
-                  )
+                  ),
+                  SizedBox(height: 20,),
+                  Container(
+                    width: MediaQuery
+                        .of(context)
+                        .size
+                        .width,
+                    decoration: neumorphicOrderButton(),
+                    child: FlatButton.icon(
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            CupertinoPageRoute(
+                                builder: (context) => UserOrders()));
+                      },
+                      icon: Icon(
+                        Icons.shopping_basket,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                      label: Text(
+                        "Orders",
+                        style: menuStyle(15),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 50,)
                 ],
               ),
             ),

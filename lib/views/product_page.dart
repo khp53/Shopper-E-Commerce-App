@@ -5,6 +5,7 @@ import 'package:shopper/services/database.dart';
 import 'package:shopper/shared/colors.dart';
 import 'package:shopper/shared/loading.dart';
 import 'package:shopper/shared/widgets.dart';
+
 import 'cart.dart';
 
 class ProductPage extends StatefulWidget {

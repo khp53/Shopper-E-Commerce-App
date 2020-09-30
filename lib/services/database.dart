@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -74,14 +75,35 @@ class Database{
   }
 
   fetchItemFromUserFavorite() async{
-    return FirebaseFirestore.instance.collection("users")
-        .doc(FirebaseAuth.instance.currentUser.uid).collection("favorites")
+    return FirebaseFirestore.instance
+        .collection("users")
+        .doc(FirebaseAuth.instance.currentUser.uid)
+        .collection("favorites")
         .snapshots();
   }
 
-  Future paymentUser(paymentMap) async{
-    return await FirebaseFirestore.instance.collection("users")
-        .doc(FirebaseAuth.instance.currentUser.uid).collection('payment').add(paymentMap);
+  Future paymentUser(paymentMap) async {
+    return await FirebaseFirestore.instance
+        .collection("users")
+        .doc(FirebaseAuth.instance.currentUser.uid)
+        .collection('payment')
+        .add(paymentMap);
   }
 
+  getUserOrders() async {
+    return FirebaseFirestore.instance
+        .collection("users")
+        .doc(FirebaseAuth.instance.currentUser.uid)
+        .collection('payment')
+        .snapshots();
+  }
+
+  Future searchProductsElectronics(String search) async {
+    return FirebaseFirestore.instance
+        .collection('products')
+        .doc('categories')
+        .collection('electronics')
+        .where("search", arrayContains: search)
+        .snapshots();
+  }
 }

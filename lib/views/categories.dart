@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shopper/services/database.dart';
@@ -6,7 +7,7 @@ import 'package:shopper/shared/cupertinoicon.dart';
 import 'package:shopper/shared/customDrawer.dart';
 import 'package:shopper/shared/loading.dart';
 import 'package:shopper/shared/widgets.dart';
-import 'package:shopper/views/product_page_electronics.dart';
+import 'package:shopper/views/product_page.dart';
 
 class Categories extends StatefulWidget {
   final String profileImg;
@@ -17,17 +18,63 @@ class Categories extends StatefulWidget {
   _CategoriesState createState() => _CategoriesState();
 }
 
-class _CategoriesState extends State<Categories> {
-  TextEditingController searchController = TextEditingController();
+class _CategoriesState extends State<Categories>
+    with SingleTickerProviderStateMixin {
   Database _database = Database();
+  TextEditingController searchController = TextEditingController();
+  String searchElectronics = "";
+  String searchShoes = "";
+  String searchGroceries = "";
+  String searchHousehold = "";
   Stream electronicsStream;
   Stream shoesStream;
   Stream householdStream;
   Stream groceriesStream;
   Stream profileStream;
 
+  final bodyGlobalKey = GlobalKey();
+  final List<Widget> cateTabs = [
+    Tab(text: "Electronics"),
+    Tab(text: "Shoes"),
+    Tab(text: "Household"),
+    Tab(
+      child: Padding(
+        padding: const EdgeInsets.only(left: 15),
+        child: Text(
+          "Groceries",
+        ),
+      ),
+    ),
+  ];
+
+  TabController _tabController;
+  ScrollController _scrollController;
+  bool fixedScroll;
+
+  Widget _buildCarousel() {
+    return Container(
+      padding: EdgeInsets.only(left: 15, right: 15, top: 15, bottom: 15),
+      child: Column(
+        children: [
+          Container(
+            alignment: Alignment.topLeft,
+            padding: EdgeInsets.only(bottom: 10),
+            child: Text(
+              "Categories",
+              style: normalStyle(30),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   void initState() {
+    _scrollController = ScrollController();
+    _scrollController.addListener(_scrollListener);
+    _tabController = TabController(length: 4, vsync: this);
+    _tabController.addListener(_smoothScrollToTop);
     getUserProfileInfo();
     getElectronicsProducts();
     getShoesProducts();
@@ -36,8 +83,33 @@ class _CategoriesState extends State<Categories> {
     super.initState();
   }
 
+  @override
+  void dispose() {
+    _tabController.dispose();
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  _scrollListener() {
+    if (fixedScroll) {
+      _scrollController.jumpTo(0);
+    }
+  }
+
+  _smoothScrollToTop() {
+    _scrollController.animateTo(
+      0,
+      duration: Duration(microseconds: 300),
+      curve: Curves.ease,
+    );
+
+    setState(() {
+      fixedScroll = _tabController.index == 2;
+    });
+  }
+
   getUserProfileInfo() async {
-    _database.getUserProfile().then((value){
+    _database.getUserProfile().then((value) {
       setState(() {
         profileStream = value;
       });
@@ -84,7 +156,11 @@ class _CategoriesState extends State<Categories> {
         leading: Builder(
           builder: (context) {
             return IconButton(
-              icon: Icon(Icons.menu, color: StyleColors.bigText, size: 30,),
+              icon: Icon(
+                Icons.menu,
+                color: StyleColors.bigText,
+                size: 30,
+              ),
               onPressed: () => CustomDrawer.of(context).open(),
             );
           },
@@ -93,244 +169,390 @@ class _CategoriesState extends State<Categories> {
           StreamBuilder(
               stream: profileStream,
               builder: (context, snapshot) {
-                return snapshot.hasData ? Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 13),
+                return snapshot.hasData
+                    ? Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 15, vertical: 13),
                   child: CircleAvatar(
                     radius: 15,
-                    backgroundImage: NetworkImage(snapshot.data.data()["img"]),
+                    backgroundImage:
+                    NetworkImage(snapshot.data.data()["img"]),
                     backgroundColor: Colors.white54,
                   ),
                 )
-                    :Center(
+                    : Center(
                   child: Padding(
                     padding: const EdgeInsets.only(right: 20),
                     child:
                     SizedBox(width: 15, height: 15, child: spinKit),
                   ),
                 );
-              }
-          )
+              })
         ],
       ),
-      body: SingleChildScrollView(
-        child: Container(
-          padding: EdgeInsets.only(left: 15, right: 15, top: 15),
-          child: Column(
+      body: NestedScrollView(
+        controller: _scrollController,
+        headerSliverBuilder: (context, value) {
+          return [
+            SliverToBoxAdapter(child: _buildCarousel()),
+            SliverToBoxAdapter(
+              child: TabBar(
+                onTap: (cateTabs) {
+                  FocusScope.of(context).unfocus();
+                },
+                labelPadding: EdgeInsets.only(right: 12, left: 15),
+                indicatorColor: Colors.transparent,
+                labelStyle: normalStyle(15),
+                labelColor: StyleColors.buttonColor,
+                unselectedLabelColor: StyleColors.hintText,
+                controller: _tabController,
+                isScrollable: true,
+                tabs: cateTabs,
+              ),
+            ),
+          ];
+        },
+        body: Container(
+          padding: EdgeInsets.only(left: 10, right: 10),
+          child: TabBarView(
+            physics: NeverScrollableScrollPhysics(),
+            controller: _tabController,
             children: [
               Container(
-                decoration: neumorphicSearch(),
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 15),
-                  child: Theme(
-                    data: Theme.of(context)
-                        .copyWith(primaryColor: StyleColors.buttonColor),
-                    child: TextFormField(
-                      textAlignVertical: TextAlignVertical.center,
-                      style: normalStyle(13),
-                      textInputAction: TextInputAction.search,
-                      validator: (val) {
-                        return searchController.text.isNotEmpty
-                            ? null
-                            : "Enter something to find product!";
-                      },
-                      controller: searchController,
-                      decoration: InputDecoration(
-                          suffixIcon: Icon(search),
-                          border: InputBorder.none,
-                          hintText: "Find Product",
-                          hintStyle: inputBoxStyle(12)),
-                    ),
-                  ),
-                ),
-              ),
-              Container(
-                alignment: Alignment.topLeft,
-                padding: EdgeInsets.only(top: 30),
-                child: Text(
-                  "Categories",
-                  style: normalStyle(30),
-                ),
-              ),
-              Container(
-                  padding: EdgeInsets.only(
-                    top: 22,
-                  ),
-                  child: _tabSection(context))
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _tabSection(BuildContext context) {
-    return DefaultTabController(
-      length: 4,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          Container(
-            child: TabBar(
-                labelPadding: EdgeInsets.only(right: 5),
-                indicatorColor: Colors.transparent,
-                labelStyle: normalStyle(14),
-                labelColor: StyleColors.bigText,
-                unselectedLabelColor: StyleColors.hintText,
-                tabs: [
-                  Tab(text: "Electronics"),
-                  Tab(text: "Shoes"),
-                  Tab(text: "Household"),
-                  Tab(
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 15),
-                      child: Text(
-                        "Groceries",
+                child: Column(
+                  children: [
+                    Container(
+                      margin: EdgeInsets.only(left: 10, right: 10,),
+                      decoration: neumorphicGrid(),
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 15),
+                        child: Theme(
+                          data: Theme.of(context)
+                              .copyWith(primaryColor: StyleColors.buttonColor),
+                          child: TextFormField(
+                            style: normalStyle(15),
+                            textAlignVertical: TextAlignVertical.center,
+                            textInputAction: TextInputAction.search,
+                            controller: searchController,
+                            decoration: InputDecoration(
+                                suffixIcon: Icon(search),
+                                border: InputBorder.none,
+                                hintText: "Find Product",
+                                hintStyle: inputBoxStyle(14)),
+                            onChanged: (val) {
+                              setState(() {
+                                searchElectronics = val;
+                              });
+                            },
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                ]),
-          ),
-          Container(
-            height: MediaQuery.of(context).size.height / 1.5,
-            padding: EdgeInsets.only(bottom: 50),
-            margin: EdgeInsets.only(bottom: 50),
-            child:
-            TabBarView(physics: NeverScrollableScrollPhysics(), children: [
+                    SizedBox(height: 20,),
+                    Expanded(
+                      flex: 10,
+                      child: StreamBuilder(
+                        stream: (searchElectronics != "" &&
+                            searchElectronics != null)
+                            ? FirebaseFirestore.instance
+                            .collection('products')
+                            .doc('categories').collection('electronics')
+                            .where("search", arrayContains: searchElectronics
+                            .toLowerCase())
+                            .snapshots()
+                            : electronicsStream,
+                        builder: (context, snapshot) {
+                          return snapshot.hasData
+                              ? GridView.builder(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 5,
+                            ),
+                            shrinkWrap: true,
+                            gridDelegate:
+                            SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2),
+                            itemCount: snapshot.data.docs.length,
+                            itemBuilder: (context, index) {
+                              return Electronics(
+                                pName: snapshot.data.docs[index]
+                                    .data()['pname'],
+                                price: snapshot.data.docs[index]
+                                    .data()['price']
+                                    .toDouble(),
+                                img: snapshot.data.docs[index]
+                                    .data()['img'],
+                                desc: snapshot.data.docs[index]
+                                    .data()['desc'],
+                                fav: snapshot.data.docs[index]
+                                    .data()['fav'],
+                                size: List.from(snapshot
+                                    .data.docs[index]
+                                    .data()['size']),
+                                color: List.from(snapshot
+                                    .data.docs[index]
+                                    .data()['color']),
+                              );
+                            },
+                          )
+                              : Center(
+                              child: spinKit
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
               Container(
-                  child: StreamBuilder(
-                    stream: electronicsStream,
-                    builder: (context, snapshot) {
-                      return snapshot.hasData
-                      ? GridView.builder(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 5,
+                child: Column(
+                  children: [
+                    Container(
+                      margin: EdgeInsets.only(left: 10, right: 10,),
+                      decoration: neumorphicGrid(),
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 15),
+                        child: Theme(
+                          data: Theme.of(context)
+                              .copyWith(primaryColor: StyleColors.buttonColor),
+                          child: TextFormField(
+                            style: normalStyle(15),
+                            textAlignVertical: TextAlignVertical.center,
+                            textInputAction: TextInputAction.search,
+                            decoration: InputDecoration(
+                                suffixIcon: Icon(search),
+                                border: InputBorder.none,
+                                hintText: "Find Product",
+                                hintStyle: inputBoxStyle(14)),
+                            onChanged: (val) {
+                              setState(() {
+                                searchShoes = val;
+                              });
+                            },
                           ),
-                          shrinkWrap: true,
-                          gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 2),
-                          itemCount: snapshot.data.docs.length,
-                          itemBuilder: (context, index) {
-                            return Electronics(
-                              pName: snapshot.data.docs[index].data()['pname'],
-                              price: snapshot.data.docs[index]
-                                  .data()['price']
-                                  .toDouble(),
-                              img: snapshot.data.docs[index].data()['img'],
-                              desc: snapshot.data.docs[index].data()['desc'],
-                              fav: snapshot.data.docs[index].data()['fav'],
-                              size: List.from(snapshot.data.docs[index].data()['size']),
-                              color: List.from(snapshot.data.docs[index].data()['color']),
-                            );
-                          },
-                        )
-                      : Center(
-                          child: Text(
-                          "Loading Products...",
-                          style: normalStyle(15),
-                        ));
-                },
-              )),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 20,),
+                    Expanded(
+                      flex: 10,
+                      child: StreamBuilder(
+                        stream: (searchShoes != "" && searchShoes != null)
+                            ? FirebaseFirestore.instance
+                            .collection('products')
+                            .doc('categories').collection('shoes')
+                            .where("search", arrayContains: searchShoes
+                            .toLowerCase())
+                            .snapshots()
+                            : shoesStream,
+                        builder: (context, snapshot) {
+                          return snapshot.hasData
+                              ? GridView.builder(
+                            padding:
+                            EdgeInsets.symmetric(horizontal: 5),
+                            shrinkWrap: true,
+                            gridDelegate:
+                            SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2),
+                            itemCount: snapshot.data.docs.length,
+                            itemBuilder: (context, index) {
+                              return Shoes(
+                                pName: snapshot.data.docs[index]
+                                    .data()['pname'],
+                                price: snapshot.data.docs[index]
+                                    .data()['price']
+                                    .toDouble(),
+                                img: snapshot.data.docs[index]
+                                    .data()['img'],
+                                desc: snapshot.data.docs[index]
+                                    .data()['desc'],
+                                fav: snapshot.data.docs[index]
+                                    .data()['fav'],
+                                size: List.from(snapshot
+                                    .data.docs[index]
+                                    .data()['size']),
+                                color: List.from(snapshot
+                                    .data.docs[index]
+                                    .data()['color']),
+                              );
+                            },
+                          )
+                              : Center(
+                              child: spinKit
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
               Container(
-                  child: StreamBuilder(
-                stream: shoesStream,
-                builder: (context, snapshot) {
-                  return snapshot.hasData
-                      ? GridView.builder(
-                          padding: EdgeInsets.symmetric(horizontal: 5),
-                          shrinkWrap: true,
-                          gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 2),
-                          itemCount: snapshot.data.docs.length,
-                          itemBuilder: (context, index) {
-                            return Shoes(
-                              pName: snapshot.data.docs[index].data()['pname'],
-                              price: snapshot.data.docs[index]
-                                  .data()['price']
-                                  .toDouble(),
-                              img: snapshot.data.docs[index].data()['img'],
-                              desc: snapshot.data.docs[index].data()['desc'],
-                              fav: snapshot.data.docs[index].data()['fav'],
-                              size: List.from(snapshot.data.docs[index].data()['size']),
-                              color: List.from(snapshot.data.docs[index].data()['color']),
-                            );
-                          },
-                        )
-                      : Center(
-                          child: Text(
-                          "Loading Products...",
-                          style: normalStyle(15),
-                        ));
-                },
-              )),
+                child: Column(
+                  children: [
+                    Container(
+                      margin: EdgeInsets.only(left: 10, right: 10,),
+                      decoration: neumorphicGrid(),
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 15),
+                        child: Theme(
+                          data: Theme.of(context)
+                              .copyWith(primaryColor: StyleColors.buttonColor),
+                          child: TextFormField(
+                            style: normalStyle(15),
+                            textAlignVertical: TextAlignVertical.center,
+                            textInputAction: TextInputAction.search,
+                            decoration: InputDecoration(
+                                suffixIcon: Icon(search),
+                                border: InputBorder.none,
+                                hintText: "Find Product",
+                                hintStyle: inputBoxStyle(14)),
+                            onChanged: (val) {
+                              setState(() {
+                                searchHousehold = val;
+                              });
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 20,),
+                    Expanded(
+                      flex: 10,
+                      child: StreamBuilder(
+                        stream: (searchHousehold != "" &&
+                            searchHousehold != null)
+                            ? FirebaseFirestore.instance
+                            .collection('products')
+                            .doc('categories').collection('household')
+                            .where("search", arrayContains: searchHousehold
+                            .toLowerCase())
+                            .snapshots()
+                            : householdStream,
+                        builder: (context, snapshot) {
+                          return snapshot.hasData
+                              ? GridView.builder(
+                            padding:
+                            EdgeInsets.symmetric(horizontal: 5),
+                            shrinkWrap: true,
+                            gridDelegate:
+                            SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2),
+                            itemCount: snapshot.data.docs.length,
+                            itemBuilder: (context, index) {
+                              return Household(
+                                pName: snapshot.data.docs[index]
+                                    .data()['pname'],
+                                price: snapshot.data.docs[index]
+                                    .data()['price']
+                                    .toDouble(),
+                                img: snapshot.data.docs[index]
+                                    .data()['img'],
+                                desc: snapshot.data.docs[index]
+                                    .data()['desc'],
+                                fav: snapshot.data.docs[index]
+                                    .data()['fav'],
+                                size: List.from(snapshot
+                                    .data.docs[index]
+                                    .data()['size']),
+                                color: List.from(snapshot
+                                    .data.docs[index]
+                                    .data()['color']),
+                              );
+                            },
+                          )
+                              : Center(
+                              child: spinKit
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
               Container(
-                  child: StreamBuilder(
-                stream: householdStream,
-                builder: (context, snapshot) {
-                  return snapshot.hasData
-                      ? GridView.builder(
-                          padding: EdgeInsets.symmetric(horizontal: 5),
-                          shrinkWrap: true,
-                          gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 2),
-                          itemCount: snapshot.data.docs.length,
-                          itemBuilder: (context, index) {
-                            return Household(
-                              pName: snapshot.data.docs[index].data()['pname'],
-                              price: snapshot.data.docs[index].data()['price'].toDouble(),
-                              img: snapshot.data.docs[index].data()['img'],
-                              desc: snapshot.data.docs[index].data()['desc'],
-                              fav: snapshot.data.docs[index].data()['fav'],
-                              size: List.from(snapshot.data.docs[index].data()['size']),
-                              color: List.from(snapshot.data.docs[index].data()['color']),
-                            );
-                          },
-                        )
-                      : Center(
-                          child: Text(
-                          "Loading Products...",
-                          style: normalStyle(15),
-                        ));
-                },
-              )),
-              Container(
-                  child: StreamBuilder(
-                stream: groceriesStream,
-                builder: (context, snapshot) {
-                  return snapshot.hasData
-                      ? GridView.builder(
-                          padding: EdgeInsets.symmetric(horizontal: 5),
-                          shrinkWrap: true,
-                          gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 2),
-                          itemCount: snapshot.data.docs.length,
-                          itemBuilder: (context, index) {
-                            return Groceries(
-                              pName: snapshot.data.docs[index].data()['pname'],
-                              price: snapshot.data.docs[index].data()['price'],
-                              img: snapshot.data.docs[index].data()['img'],
-                              desc: snapshot.data.docs[index].data()['desc'],
-                              fav: snapshot.data.docs[index].data()['fav'],
-                              size: List.from(snapshot.data.docs[index].data()['size']),
-                              color: List.from(snapshot.data.docs[index].data()['color']),
-                            );
-                          },
-                        )
-                      : Center(
-                          child: Text(
-                          "Loading Products...",
-                          style: normalStyle(15),
-                        ));
-                },
-              )),
-            ]),
+                child: Column(
+                  children: [
+                    Container(
+                      margin: EdgeInsets.only(left: 10, right: 10,),
+                      decoration: neumorphicGrid(),
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 15),
+                        child: Theme(
+                          data: Theme.of(context)
+                              .copyWith(primaryColor: StyleColors.buttonColor),
+                          child: TextFormField(
+                            style: normalStyle(15),
+                            textAlignVertical: TextAlignVertical.center,
+                            textInputAction: TextInputAction.search,
+                            decoration: InputDecoration(
+                                suffixIcon: Icon(search),
+                                border: InputBorder.none,
+                                hintText: "Find Product",
+                                hintStyle: inputBoxStyle(14)),
+                            onChanged: (val) {
+                              setState(() {
+                                searchGroceries = val;
+                              });
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 20,),
+                    Expanded(
+                      flex: 10,
+                      child: StreamBuilder(
+                        stream: (searchGroceries != "" &&
+                            searchGroceries != null)
+                            ? FirebaseFirestore.instance
+                            .collection('products')
+                            .doc('categories').collection('groceries')
+                            .where("search", arrayContains: searchGroceries
+                            .toLowerCase())
+                            .snapshots()
+                            : groceriesStream,
+                        builder: (context, snapshot) {
+                          return snapshot.hasData
+                              ? GridView.builder(
+                            padding:
+                            EdgeInsets.symmetric(horizontal: 5),
+                            shrinkWrap: true,
+                            gridDelegate:
+                            SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2),
+                            itemCount: snapshot.data.docs.length,
+                            itemBuilder: (context, index) {
+                              return Groceries(
+                                pName: snapshot.data.docs[index]
+                                    .data()['pname'],
+                                price: snapshot.data.docs[index]
+                                    .data()['price'],
+                                img: snapshot.data.docs[index]
+                                    .data()['img'],
+                                desc: snapshot.data.docs[index]
+                                    .data()['desc'],
+                                fav: snapshot.data.docs[index]
+                                    .data()['fav'],
+                                size: List.from(snapshot
+                                    .data.docs[index]
+                                    .data()['size']),
+                                color: List.from(snapshot
+                                    .data.docs[index]
+                                    .data()['color']),
+                              );
+                            },
+                          )
+                              : Center(
+                              child: spinKit
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
-    );
+        ),),);
   }
 }
 
@@ -342,8 +564,15 @@ class Electronics extends StatelessWidget {
   final String img;
   final List<String> size;
   final List<String> color;
-  const Electronics(
-      {Key key, this.pName, this.desc, this.price, this.fav, this.img, this.size, this.color})
+
+  const Electronics({Key key,
+    this.pName,
+    this.desc,
+    this.price,
+    this.fav,
+    this.img,
+    this.size,
+    this.color})
       : super(key: key);
 
   addToFav() {
@@ -367,14 +596,14 @@ class Electronics extends StatelessWidget {
             context,
             CupertinoPageRoute(
                 builder: (context) => ProductPage(
-                      pName: pName,
-                      price: price,
-                      desc: desc,
-                      img: img,
-                      fav: fav,
-                      size: size,
-                      color: color,
-                    )));
+                  pName: pName,
+                  price: price,
+                  desc: desc,
+                  img: img,
+                  fav: fav,
+                  size: size,
+                  color: color,
+                )));
       },
       child: Container(
         margin: EdgeInsets.only(left: 5, right: 5, bottom: 10),
@@ -448,7 +677,7 @@ class Electronics extends StatelessWidget {
             Positioned(
               child: Container(
                 padding:
-                    EdgeInsets.only(left: 35, right: 0, bottom: 50, top: 30),
+                EdgeInsets.only(left: 35, right: 0, bottom: 50, top: 30),
                 child: Image.network(
                   img,
                   fit: BoxFit.contain,
@@ -479,7 +708,14 @@ class Shoes extends StatefulWidget {
   final List<String> size;
   final List<String> color;
 
-  Shoes({Key key, this.pName, this.desc, this.price, this.fav, this.img, this.size, this.color})
+  Shoes({Key key,
+    this.pName,
+    this.desc,
+    this.price,
+    this.fav,
+    this.img,
+    this.size,
+    this.color})
       : super(key: key);
 
   @override
@@ -495,8 +731,8 @@ class _ShoesState extends State<Shoes> {
       "price": widget.price,
       "img": widget.img,
       "desc": widget.desc,
-      "size" : widget.size,
-      "color" : widget.color,
+      "size": widget.size,
+      "color": widget.color,
     };
     _database.addItemToUserFavorite(favoriteMap);
   }
@@ -509,14 +745,14 @@ class _ShoesState extends State<Shoes> {
             context,
             CupertinoPageRoute(
                 builder: (context) => ProductPage(
-                      pName: widget.pName,
-                      price: widget.price,
-                      desc: widget.desc,
-                      img: widget.img,
-                      fav: widget.fav,
-                      size: widget.size,
-                      color: widget.color,
-                    )));
+                  pName: widget.pName,
+                  price: widget.price,
+                  desc: widget.desc,
+                  img: widget.img,
+                  fav: widget.fav,
+                  size: widget.size,
+                  color: widget.color,
+                )));
       },
       child: Container(
         margin: EdgeInsets.only(left: 5, right: 5, bottom: 10),
@@ -604,8 +840,14 @@ class Household extends StatelessWidget {
   final List<String> size;
   final List<String> color;
 
-  const Household(
-      {Key key, this.pName, this.desc, this.price, this.fav, this.img, this.size, this.color})
+  const Household({Key key,
+    this.pName,
+    this.desc,
+    this.price,
+    this.fav,
+    this.img,
+    this.size,
+    this.color})
       : super(key: key);
 
   addToFav() {
@@ -614,8 +856,8 @@ class Household extends StatelessWidget {
       "price": price,
       "img": img,
       "desc": desc,
-      "size" : size,
-      "color" : color
+      "size": size,
+      "color": color
     };
     Database().addItemToUserFavorite(favoriteMap);
   }
@@ -628,15 +870,16 @@ class Household extends StatelessWidget {
           Navigator.push(
               context,
               CupertinoPageRoute(
-                  builder: (context) => ProductPage(
-                    pName: pName,
-                    price: price,
-                    desc: desc,
-                    img: img,
-                    fav: fav,
-                    size: size,
-                    color: color,
-                  )));
+                  builder: (context) =>
+                      ProductPage(
+                        pName: pName,
+                        price: price,
+                        desc: desc,
+                        img: img,
+                        fav: fav,
+                        size: size,
+                        color: color,
+                      )));
         },
         child: Container(
           margin: EdgeInsets.only(left: 5, right: 5, bottom: 10),
@@ -681,7 +924,8 @@ class Household extends StatelessWidget {
                             content: Text(
                               "Item Added To Favorite List!",
                               style: TextStyle(
-                                  fontFamily: 'ProductSans', color: Colors.white),
+                                  fontFamily: 'ProductSans',
+                                  color: Colors.white),
                             ),
                             backgroundColor: Theme.of(context).accentColor,
                             behavior: SnackBarBehavior.floating,
@@ -722,8 +966,15 @@ class Groceries extends StatelessWidget {
   final String img;
   final List<String> size;
   final List<String> color;
-  const Groceries(
-      {Key key, this.pName, this.desc, this.price, this.fav, this.img, this.size, this.color})
+
+  const Groceries({Key key,
+    this.pName,
+    this.desc,
+    this.price,
+    this.fav,
+    this.img,
+    this.size,
+    this.color})
       : super(key: key);
 
   addToFav() {
@@ -732,8 +983,8 @@ class Groceries extends StatelessWidget {
       "price": price,
       "img": img,
       "desc": desc,
-      "size" : size,
-      "color" : color
+      "size": size,
+      "color": color
     };
     Database().addItemToUserFavorite(favoriteMap);
   }
@@ -746,15 +997,16 @@ class Groceries extends StatelessWidget {
           Navigator.push(
               context,
               CupertinoPageRoute(
-                  builder: (context) => ProductPage(
-                    pName: pName,
-                    price: price,
-                    desc: desc,
-                    img: img,
-                    fav: fav,
-                    size: size,
-                    color: color,
-                  )));
+                  builder: (context) =>
+                      ProductPage(
+                        pName: pName,
+                        price: price,
+                        desc: desc,
+                        img: img,
+                        fav: fav,
+                        size: size,
+                        color: color,
+                      )));
         },
         child: Container(
           margin: EdgeInsets.only(left: 5, right: 5, bottom: 10),
@@ -799,7 +1051,8 @@ class Groceries extends StatelessWidget {
                             content: Text(
                               "Item Added To Favorite List!",
                               style: TextStyle(
-                                  fontFamily: 'ProductSans', color: Colors.white),
+                                  fontFamily: 'ProductSans',
+                                  color: Colors.white),
                             ),
                             backgroundColor: Theme.of(context).accentColor,
                             behavior: SnackBarBehavior.floating,

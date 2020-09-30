@@ -1,11 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:shopper/services/database.dart';
 import 'package:shopper/shared/colors.dart';
-import 'package:shopper/shared/cupertinoicon.dart';
-import 'package:shopper/shared/customDrawer.dart';
 import 'package:shopper/shared/custom_bottom_appbar.dart';
-import 'package:shopper/shared/widgets.dart';
 import 'package:shopper/views/cart.dart';
 import 'package:shopper/views/categories.dart';
 import 'package:shopper/views/favorite.dart';
@@ -18,7 +14,6 @@ class StoreHome extends StatefulWidget {
 }
 
 class _StoreHomeState extends State<StoreHome> {
-
   int _selectedIndex = 0;
   static List<Widget> _widgetOptions = <Widget>[
     Categories(),
@@ -36,34 +31,36 @@ class _StoreHomeState extends State<StoreHome> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: Container(
-        width: 63.0,
-        height: 63.0,
-        child: FloatingActionButton(
-          child: Icon(Icons.shopping_cart, size: 28,),
-          onPressed: (){
-            Navigator.push(context, CupertinoPageRoute(
-              builder: (context) => Cart()
-            ));
-          },
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        floatingActionButton: Container(
+          width: 63.0,
+          height: 63.0,
+          child: FloatingActionButton(
+            child: Icon(
+              Icons.shopping_cart,
+              size: 28,
+            ),
+            onPressed: () {
+              Navigator.push(
+                  context, CupertinoPageRoute(builder: (context) => Cart()));
+            },
+          ),
         ),
-      ),
-      bottomNavigationBar: FABBottomAppBar(
-        backgroundColor: Theme.of(context).primaryColor,
-        iconSize: 20,
-        onTabSelected: _onItemTapped,
-        notchedShape: CircularNotchedRectangle(),
-        color: StyleColors.hintText,
-        selectedColor: Theme.of(context).accentColor,
-        items: [
-          FABBottomAppBarItem(iconData1: Icons.content_paste, text: 'Categories'),
-          FABBottomAppBarItem(iconData1: Icons.chat_bubble, text: 'Messages'),
-          FABBottomAppBarItem(iconData1: Icons.favorite, text: 'Favorite'),
-          FABBottomAppBarItem(iconData1: Icons.person, text: 'Profile'),
-        ],
-      ),
-      body:  _widgetOptions.elementAt(_selectedIndex)
-    );
+        bottomNavigationBar: FABBottomAppBar(
+          backgroundColor: Theme.of(context).primaryColor,
+          iconSize: 20,
+          onTabSelected: _onItemTapped,
+          notchedShape: CircularNotchedRectangle(),
+          color: StyleColors.hintText,
+          selectedColor: Theme.of(context).accentColor,
+          items: [
+            FABBottomAppBarItem(
+                iconData1: Icons.content_paste, text: 'Categories'),
+            FABBottomAppBarItem(iconData1: Icons.chat_bubble, text: 'Messages'),
+            FABBottomAppBarItem(iconData1: Icons.favorite, text: 'Favorite'),
+            FABBottomAppBarItem(iconData1: Icons.person, text: 'Profile'),
+          ],
+        ),
+        body: _widgetOptions.elementAt(_selectedIndex));
   }
 }

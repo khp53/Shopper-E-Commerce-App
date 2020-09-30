@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
@@ -7,7 +8,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:shopper/services/auth.dart';
 import 'package:shopper/services/database.dart';
 import 'package:shopper/shared/colors.dart';
-import 'package:shopper/shared/customDrawer.dart';
 import 'package:shopper/shared/widgets.dart';
 
 class EditProfile extends StatefulWidget {
@@ -21,6 +21,7 @@ class _EditProfileState extends State<EditProfile> {
   TextEditingController fullNameTextEditingController = TextEditingController();
   TextEditingController userNameTextEditingController = TextEditingController();
   TextEditingController emailTextEditingController = TextEditingController();
+  TextEditingController addressTextEditingController = TextEditingController();
 
   Database database = Database();
   Stream profileStream;
@@ -55,6 +56,8 @@ class _EditProfileState extends State<EditProfile> {
   updateProfile(url) async {
     Map<String, String> data = {
       "img": url,
+      "fullName": fullNameTextEditingController.text,
+      "shippingAddress": addressTextEditingController.text
     };
     database.updateProfile(data);
   }
@@ -68,6 +71,7 @@ class _EditProfileState extends State<EditProfile> {
         : Scaffold(
             appBar: AppBar(
               elevation: 0,
+              centerTitle: true,
               title: Text(
                 "Edit Profile",
                 style: normalStyle(20),
@@ -148,44 +152,19 @@ class _EditProfileState extends State<EditProfile> {
                                                   primaryColor:
                                                       StyleColors.buttonColor),
                                               child: TextFormField(
-                                                enabled: false,
+                                                enabled: true,
                                                 style: normalStyle(13),
                                                 textInputAction:
-                                                    TextInputAction.go,
+                                                    TextInputAction.done,
                                                 controller:
-                                                    userNameTextEditingController,
+                                                    addressTextEditingController,
                                                 decoration: InputDecoration(
                                                     border: InputBorder.none,
-                                                    hintText: snapshot.data
-                                                        .data()["userName"],
-                                                    hintStyle: inputBoxStyle(12)),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          height: 20,
-                                        ),
-                                        Container(
-                                          decoration: neumorphicTextInput(),
-                                          child: Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 15),
-                                            child: Theme(
-                                              data: Theme.of(context).copyWith(
-                                                  primaryColor:
-                                                  StyleColors.buttonColor),
-                                              child: TextFormField(
-                                                enabled: false,
-                                                style: normalStyle(13),
-                                                textInputAction:
-                                                TextInputAction.done,
-                                                controller:
-                                                emailTextEditingController,
-                                                decoration: InputDecoration(
-                                                    border: InputBorder.none,
-                                                    hintText: snapshot.data.data()["email"],
-                                                    hintStyle: inputBoxStyle(12)),
+                                                    hintText:
+                                                        snapshot.data.data()[
+                                                            "shippingAddress"],
+                                                    hintStyle:
+                                                        inputBoxStyle(12)),
                                               ),
                                             ),
                                           ),
@@ -229,7 +208,11 @@ class _EditProfileState extends State<EditProfile> {
                                             decoration: neumorphicButton(),
                                             child: FlatButton.icon(
                                               onPressed: () async {
-                                                if (_image != null) {
+                                                if (_image != null &&
+                                                    fullNameTextEditingController
+                                                        .text.isNotEmpty &&
+                                                    addressTextEditingController
+                                                        .text.isNotEmpty) {
                                                   await database
                                                       .uploadUserImage(_image);
                                                   final ref = FirebaseStorage
@@ -237,29 +220,37 @@ class _EditProfileState extends State<EditProfile> {
                                                       .ref()
                                                       .child("user_image")
                                                       .child(FirebaseAuth
-                                                              .instance
-                                                              .currentUser
-                                                              .email +
-                                                          '.jpg');
+                                                      .instance
+                                                      .currentUser
+                                                      .email +
+                                                      '.jpg');
                                                   final url = await ref
                                                       .getDownloadURL();
                                                   updateProfile(url);
-                                                  userNameTextEditingController
+                                                  fullNameTextEditingController
+                                                      .clear();
+                                                  addressTextEditingController
                                                       .clear();
                                                   Scaffold.of(context)
                                                       .showSnackBar(SnackBar(
-                                                        backgroundColor: Theme.of(context).accentColor,
-                                                        behavior: SnackBarBehavior.floating,
-                                                        content:
-                                                        Text("Profile Updated"),
+                                                    backgroundColor: Theme
+                                                        .of(context)
+                                                        .accentColor,
+                                                    behavior: SnackBarBehavior
+                                                        .floating,
+                                                    content:
+                                                    Text("Profile Updated"),
                                                   ));
                                                 } else {
                                                   Scaffold.of(context)
                                                       .showSnackBar(SnackBar(
-                                                        backgroundColor: Theme.of(context).accentColor,
-                                                        behavior: SnackBarBehavior.floating,
-                                                        content: Text(
-                                                        "You have to select an image"),
+                                                    backgroundColor: Theme
+                                                        .of(context)
+                                                        .accentColor,
+                                                    behavior: SnackBarBehavior
+                                                        .floating,
+                                                    content: Text(
+                                                        "You have to select an image & fill all the fields"),
                                                   ));
                                                 }
                                               },
@@ -275,7 +266,7 @@ class _EditProfileState extends State<EditProfile> {
                                             ),
                                           ),
                                         ),
-                                        SizedBox(height: 30,)
+                                        SizedBox(height: 50,),
                                       ],
                                     ),
                                   ],

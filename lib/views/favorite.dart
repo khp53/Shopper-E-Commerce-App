@@ -7,7 +7,7 @@ import 'package:shopper/shared/colors.dart';
 import 'package:shopper/shared/customDrawer.dart';
 import 'package:shopper/shared/loading.dart';
 import 'package:shopper/shared/widgets.dart';
-import 'package:shopper/views/product_page_electronics.dart';
+import 'package:shopper/views/product_page.dart';
 
 class Favorites extends StatefulWidget {
   @override
@@ -122,11 +122,7 @@ class _FavoritesState extends State<Favorites> {
                             },
                           )
                         : Center(
-                            child: Text(
-                              "Loading...",
-                              style: normalStyle(15),
-                            ),
-                          );
+                        child: spinKit);
                   },
                 ),
               ),
@@ -136,7 +132,7 @@ class _FavoritesState extends State<Favorites> {
   }
 }
 
-class CartTile extends StatelessWidget {
+class CartTile extends StatefulWidget {
   final String pname;
   final double price;
   final String img;
@@ -144,14 +140,19 @@ class CartTile extends StatelessWidget {
   final List<String> size;
   final List<String> color;
   final DocumentReference dId;
-  const CartTile(
-      {Key key,
-      this.pname,
-      this.price,
-      this.img,
-      this.dId, this.desc, this.size, this.color})
+
+  const CartTile({Key key,
+    this.pname,
+    this.price,
+    this.img,
+    this.dId, this.desc, this.size, this.color})
       : super(key: key);
 
+  @override
+  _CartTileState createState() => _CartTileState();
+}
+
+class _CartTileState extends State<CartTile> {
   @override
   Widget build(BuildContext context) {
     return Slidable(
@@ -170,12 +171,12 @@ class CartTile extends StatelessWidget {
               maxHeight: 50,
             ),
             child: Image.network(
-              img,
+              widget.img,
               fit: BoxFit.cover,
             ),
           ),
           title: Text(
-            '$pname',
+            '${widget.pname}',
             style: normalStyle(15),
           ),
           subtitle: Padding(
@@ -183,7 +184,7 @@ class CartTile extends StatelessWidget {
             child: Row(
               children: [
                 Text(
-                  '\$$price',
+                  '\$${widget.price}',
                   style: TextStyle(
                       color: Colors.grey,
                       fontWeight: FontWeight.bold,
@@ -205,14 +206,14 @@ class CartTile extends StatelessWidget {
           ),
           onTap: () {
             Navigator.push(context, CupertinoPageRoute(
-              builder: (context) => ProductPage(
-                img: img,
-                price: price,
-                pName: pname,
-                desc: desc,
-                size: size,
-                color: color,
-              )
+                builder: (context) => ProductPage(
+                  img: widget.img,
+                  price: widget.price,
+                  pName: widget.pname,
+                  desc: widget.desc,
+                  size: widget.size,
+                  color: widget.color,
+                )
             ));
           },
         ),
@@ -226,14 +227,16 @@ class CartTile extends StatelessWidget {
           onTap: () async {
             await FirebaseFirestore.instance
                 .runTransaction((Transaction myTransaction) async {
-              myTransaction.delete(dId);
+              myTransaction.delete(widget.dId);
             });
-            Scaffold.of(context).showSnackBar(SnackBar(
-              content: Text("Item has been removed from favorite!"),
-              backgroundColor: Colors.red,
-              elevation: 0,
-              behavior: SnackBarBehavior.floating,
-            ));
+            setState(() {
+              Scaffold.of(context).showSnackBar(SnackBar(
+                content: Text("Item has been removed from favorite!"),
+                backgroundColor: Colors.red,
+                elevation: 0,
+                behavior: SnackBarBehavior.floating,
+              ));
+            });
           },
         ),
       ],
