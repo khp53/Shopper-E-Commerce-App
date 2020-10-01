@@ -1,16 +1,28 @@
-# shopper
+# Shopper!
 
-A new Flutter application.
+A Flutter Firebase E-commerce App.
 
-## Getting Started
+## Features:
+- Neumorphism design in User Interface!
+- Flare 60 FPS Animations
+- State Management
+- Completely different Cart, Favorite and Orders page for each different users!
+- Instant Product Search based on categories and using tags.
+- From adding products based on size, quantity, color to checking out using three different payment method almost everything added.
+- Complex UI design yet simple and easy to use!
 
-This project is a starting point for a Flutter application.
+## Screen Caps
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+<p align="center">
+  <img src="https://github.com/khp53/Chatty-A-chat-App/blob/master/assets/ss10.jpg" width="350">
+  <img src="https://github.com/khp53/Chatty-A-chat-App/blob/master/assets/ss11.jpg" width="350">
+  <img src="https://github.com/khp53/Chatty-A-chat-App/blob/master/assets/ss1.jpg" width="350">
+  <img src="https://github.com/khp53/Chatty-A-chat-App/blob/master/assets/ss2.jpg" width="350">
+  <img src="https://github.com/khp53/Chatty-A-chat-App/blob/master/assets/ss3.jpg" width="350">
+  <img src="https://github.com/khp53/Chatty-A-chat-App/blob/master/assets/ss4.jpg" width="350">
+  <img src="https://github.com/khp53/Chatty-A-chat-App/blob/master/assets/ss5.jpg" width="350">
+  <img src="https://github.com/khp53/Chatty-A-chat-App/blob/master/assets/ss6.jpg" width="350">
+  <img src="https://github.com/khp53/Chatty-A-chat-App/blob/master/assets/ss7.jpg" width="350">
+  <img src="https://github.com/khp53/Chatty-A-chat-App/blob/master/assets/ss8.jpg" width="350">
+  <img src="https://github.com/khp53/Chatty-A-chat-App/blob/master/assets/ss9.jpg" width="350">
+</p>
