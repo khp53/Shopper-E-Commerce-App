@@ -1,3 +1,4 @@
+import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shopper/services/auth.dart';
@@ -44,6 +45,7 @@ class _SignUpState extends State<SignUp> {
             "userName": userNameTextEditingController.text,
             "email": emailTextEditingController.text,
             "fullName": fullNameTextEditingController.text,
+            "shippingAddress" : "Enter Your Shipping Address!"
           };
           _database.uploadUserInfo(userInfoMap);
           Navigator.pushReplacement(
@@ -96,8 +98,15 @@ class _SignUpState extends State<SignUp> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text("Shopper!", style: logoStyle()),
-                  SizedBox(height: 40,),
+                  Container(
+                    height: MediaQuery.of(context).size.height /4,
+                    child: FlareActor(
+                      "assets/logo.flr",
+                      alignment:Alignment.center,
+                      fit:BoxFit.contain,
+                      animation:"title animation",
+                    ),
+                  ),
                   Container(
                     decoration: neumorphicTextInput(),
                     child: Padding(

@@ -1,3 +1,4 @@
+import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shopper/services/auth.dart';
@@ -85,8 +86,15 @@ class _SignInState extends State<SignIn> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text("Shopper!", style: logoStyle()),
-                  SizedBox(height: 40,),
+                  Container(
+                    height: MediaQuery.of(context).size.height /4,
+                    child: FlareActor(
+                      "assets/logo.flr",
+                      alignment:Alignment.center,
+                      fit:BoxFit.contain,
+                      animation:"title animation",
+                    ),
+                  ),
                   Container(
                     decoration: neumorphicTextInput(),
                     child: Padding(

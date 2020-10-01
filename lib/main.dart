@@ -1,5 +1,9 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flare_flutter/flare_actor.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shopper/services/auth.dart';
@@ -33,9 +37,43 @@ class MyApp extends StatelessWidget {
           scaffoldBackgroundColor: Color(0xFFF2F2F7),
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
-        home: StateManagement(),
+        home: SplashScreen(),
       ),
     );
+  }
+}
+
+class SplashScreen extends StatefulWidget {
+  @override
+  _SplashScreenState createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen> {
+  @override
+  void initState() {
+    super.initState();
+    Timer(
+        Duration(seconds: 4),
+            ()=> Navigator.pushReplacement(context, CupertinoPageRoute(
+            builder: (context) => StateManagement()
+        ))
+    );
+  }
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        body: Center(
+          child: Container(
+            height: MediaQuery.of(context).size.height /4,
+            child: FlareActor(
+              "assets/splash.flr",
+              alignment:Alignment.center,
+              fit:BoxFit.contain,
+              animation:"splash_shopper",
+            ),
+          ),
+        ),
+      );
   }
 }
 

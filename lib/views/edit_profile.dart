@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:shopper/services/auth.dart';
 import 'package:shopper/services/database.dart';
 import 'package:shopper/shared/colors.dart';
+import 'package:shopper/shared/loading.dart';
 import 'package:shopper/shared/widgets.dart';
 
 class EditProfile extends StatefulWidget {
@@ -60,13 +61,16 @@ class _EditProfileState extends State<EditProfile> {
       "shippingAddress": addressTextEditingController.text
     };
     database.updateProfile(data);
+    setState(() {
+      isLoading = false;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return isLoading
         ? Center(
-            child: CircularProgressIndicator(),
+            child: Container(color: Colors.white,child: spinKit),
           )
         : Scaffold(
             appBar: AppBar(
@@ -213,6 +217,9 @@ class _EditProfileState extends State<EditProfile> {
                                                         .text.isNotEmpty &&
                                                     addressTextEditingController
                                                         .text.isNotEmpty) {
+                                                  setState(() {
+                                                    isLoading = true;
+                                                  });
                                                   await database
                                                       .uploadUserImage(_image);
                                                   final ref = FirebaseStorage
@@ -231,17 +238,10 @@ class _EditProfileState extends State<EditProfile> {
                                                       .clear();
                                                   addressTextEditingController
                                                       .clear();
-                                                  Scaffold.of(context)
-                                                      .showSnackBar(SnackBar(
-                                                    backgroundColor: Theme
-                                                        .of(context)
-                                                        .accentColor,
-                                                    behavior: SnackBarBehavior
-                                                        .floating,
-                                                    content:
-                                                    Text("Profile Updated"),
-                                                  ));
                                                 } else {
+                                                  setState(() {
+                                                    isLoading = false;
+
                                                   Scaffold.of(context)
                                                       .showSnackBar(SnackBar(
                                                     backgroundColor: Theme
@@ -252,6 +252,7 @@ class _EditProfileState extends State<EditProfile> {
                                                     content: Text(
                                                         "You have to select an image & fill all the fields"),
                                                   ));
+                                                  });
                                                 }
                                               },
                                               icon: Icon(
